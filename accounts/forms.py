@@ -36,7 +36,7 @@ class WebsiteCreationForm(MyModelForm):
 
     def clean_website_url(self):
         website_url = self.cleaned_data['website_url'].lower()
-        website_url = website_url.replace('http://', '').replace('https://', '').replace('www.', '')
+        website_url = website_url.replace('http://', '').replace('https://', '').replace('www.', '').strip('/')
         if Website.objects.filter(website_url=website_url).exists():
             raise forms.ValidationError("This website was already registered")
         return website_url

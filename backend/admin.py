@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from backend.models import Message, SupportMessage, AccountTypes
+
+admin.site.register((
+    Message,
+    SupportMessage,
+    AccountTypes
+))

@@ -15,4 +15,5 @@ urlpatterns = [
     path('data-collection', TemplateView.as_view(template_name='privalytics/data_collection.html'), name='data-collection'),
     path('', include('accounts.urls')),
     path('', include('tracker.urls')),
+    path('', include('backend.urls')),
 ]

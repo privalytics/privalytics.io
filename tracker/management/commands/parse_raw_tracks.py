@@ -27,7 +27,7 @@ class Command(BaseCommand):
             try:
                 profile = Profile.objects.get(account_id=raw_tracker.account_id)
             except Profile.DoesNotExist:
-                # raw_tracker.ip = None
+                raw_tracker.ip = None
                 raw_tracker.wrong_account_id = True
                 raw_tracker.processed = True
                 raw_tracker.save()
@@ -38,18 +38,18 @@ class Command(BaseCommand):
             page = parsed_url.path
             utm_source = queries.get('utm_source')
             website_url = url.lower()
-            website_url = website_url.replace('http://', '').replace('https://', '').replace('www.', '')
+            website_url = website_url.replace('http://', '').replace('https://', '').replace('www.', '').strip('/')
             try:
                 website = Website.objects.get(website_url=website_url)
             except Website.DoesNotExist:
-                # raw_tracker.ip = None
+                raw_tracker.ip = None
                 raw_tracker.website_does_not_exist = True
                 raw_tracker.processed = True
                 raw_tracker.save()
                 continue
 
             if website.owner != profile.user:
-                # raw_tracker.ip = None
+                raw_tracker.ip = None
                 raw_tracker.wrong_owner = True
                 raw_tracker.processed = True
                 raw_tracker.save()
@@ -108,7 +108,7 @@ class Command(BaseCommand):
 
                         except:
                             pass
-                    # raw_tracker.ip = None
+                    raw_tracker.ip = None
 
                 tracker.save()
             raw_tracker.processed = True

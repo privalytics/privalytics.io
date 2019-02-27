@@ -265,7 +265,7 @@ class RawTracker(models.Model):
     referrer = models.URLField(blank=True, null=True)
     dnt = models.BooleanField(default=False)
     account_id = models.CharField(max_length=15)
-    ip = models.GenericIPAddressField(null=True, blank=True)  # This field will be erased as soon as the tracker is processeed
+    ip = models.GenericIPAddressField(null=True, blank=True)   # This field will be erased as soon as the tracker is processeed
     user_agent = models.CharField(max_length=255, blank=True, null=True)
     processed = models.BooleanField(default=False)
     screen_width = models.IntegerField(blank=True, null=True)
