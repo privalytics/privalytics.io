@@ -1,0 +1,135 @@
+<script>
+    var ctx = document.getElementById("visitsdaychart");
+    var visits_day_chart = new Chart(ctx, {
+        type: 'line',
+        responsive: true,
+        data: {
+            datasets: [
+                {
+                    label: "Daily Visits",
+                    fill: false,
+                    backgroundColor: '#90aaec',
+                    borderColor: '#6c86bd',
+                    data: {{ website.visits_day|safe }}
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    },
+
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: false
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<script>
+    var ctx = document.getElementById("visitshourchart");
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        responsive: true,
+        data: {
+            datasets: [
+                {
+                    label: "Hourly Visits",
+                    fill: false,
+                    backgroundColor: '#90aaec',
+                    borderColor: '#6c86bd',
+                    data: {{ website.visits_hour|safe }}
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'hour'
+                    },
+
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: false
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<script>
+    device_data = {{ website.popular_devices_30_days|safe }};
+    var ctx = document.getElementById("devices-chart");
+    var myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: device_data['device_label'],
+            datasets: [{
+                label: "Device distribution",
+                data: device_data['visits_data']
+            }]
+        },
+    });
+</script>
+<script>
+    var countries = {{ website.countries_30_days|safe }};
+</script>
+<script>
+    device_data = {{ devices|safe }};
+    var ctx = document.getElementById("devicesPieChart");
+    var myPieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: device_data['device_label'],
+            datasets: [{
+                data: device_data['visits_data'],
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+            legend: {
+                display: true
+            },
+            cutoutPercentage: 80,
+        },
+    });
+</script>
+
+<script>
+    device_data = {{ operating_systems|safe }};
+    var ctx = document.getElementById("os-chart");
+    var myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: device_data['os_label'],
+            datasets: [{
+                label: "OS",
+                data: device_data['visits_data']
+            }]
+        },
+    });
+</script>

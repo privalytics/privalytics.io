@@ -1,0 +1,70 @@
+<section class="pricing py-5" id="pricing">
+    <div class="container">
+        <div class="row">
+            <!-- Free Tier -->
+            <div class="col-lg-4">
+                <div class="card mb-5 mb-lg-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted text-uppercase text-center">Beginner</h5>
+                        <h6 class="card-price text-center">$0<span class="period">/month</span></h6>
+                        <hr>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>10k visits/month</li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>6-month statistics</li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>1 website
+                            </li>
+                            <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Multi-user support
+                            </li>
+                            <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Geolocation
+                            </li>
+                        </ul>
+                        <a href="{% url 'signup-account-type' 'beginner' %}" class="btn btn-block btn-primary text-uppercase">Register</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Plus Tier -->
+            <div class="col-lg-4">
+                <div class="card mb-5 mb-lg-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted text-uppercase text-center">Blogger</h5>
+                        <h6 class="card-price text-center">$2<span class="period">/month</span></h6>
+                        <hr>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span><strong>100k visits/month</strong></li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>6-month statistics</li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>1 Website
+                            </li>
+                            <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>
+                                Multi-user support
+                            </li>
+                            <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>
+                                Geolocation
+                            </li>
+                        </ul>
+                        <a href="{% url 'signup-account-type' 'basic' %}" class="btn btn-block btn-primary text-uppercase">Register</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Pro Tier -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted text-uppercase text-center">Advanced</h5>
+                        <h6 class="card-price text-center">$5<span class="period">/month</span></h6>
+                        <hr>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span><strong>1M visits/month</strong>
+                            </li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>1 year statistics</li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Websites
+                            </li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>5 Collaborators</li>
+                            <li><span class="fa-li"><i class="fas fa-check"></i></span>Geolocation</li>
+                        </ul>
+                        <a href="{% url 'signup-account-type' 'advanced' %}" class="btn btn-block btn-primary text-uppercase">Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
