@@ -114,3 +114,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+/util/upgrade_private.py
