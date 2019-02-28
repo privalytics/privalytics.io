@@ -113,6 +113,14 @@ class Website(models.Model):
                            .order_by('-visits')[:10]
         return screen_width
 
+    def get_screen_width(self, start_date, end_date):
+        screen_width = self.trackers \
+                           .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+                           .exclude(type_device=Tracker.BOT) \
+                           .exclude(screen_height=0) \
+                           .values('screen_width')
+        return screen_width
+
     def get_top_pages(self, start_date, end_date):
         pages = self.trackers \
                     .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
@@ -371,7 +379,7 @@ class Tracker(models.Model):
     dnt = models.BooleanField(default=False)
 
     # The domain of the referrer, everything up to the first '/'
-    referrer_url = models.URLField(blank=True, null=True)
+    referrer_url = models.CharField(blank=True, null=True, max_length=255)
     # The page from which the visitor came from. Everything from the first '/'
     referrer_page = models.CharField(max_length=255, blank=True, null=True)
 
