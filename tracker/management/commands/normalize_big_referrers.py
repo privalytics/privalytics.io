@@ -19,6 +19,6 @@ class Command(BaseCommand):
             ('reddit', 'Reddit')
         )
         for big_referrer in big_referrers:
-            trackers = Tracker.objects.filter(referrer_url__contains=big_referrer)
-            logger.info('Going to normalize {} referrers of {}'.format(trackers.count(), big_referrer))
-            trackers.update(referrer_url=big_referrer)
+            trackers = Tracker.objects.filter(referrer_url__contains=big_referrer[0])
+            logger.info('Going to normalize {} referrers of {}'.format(trackers.count(), big_referrer[0]))
+            trackers.update(referrer_url=big_referrer[1])
