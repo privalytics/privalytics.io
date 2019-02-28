@@ -56,8 +56,8 @@ class AsyncEmail(models.Model):
             send_mail(
                 self.subject,
                 self.msg_txt,
-                '{}<{}>'.format(self.from_name, self.from_email),
-                ['{}<{}>'.format(self.to_name, self.to_email)],
+                '{} <{}>'.format(self.from_name, self.from_email),
+                ['{} <{}>'.format(self.to_name, self.to_email)],
                 fail_silently=False,
             )
             self.sent = True
