@@ -1,5 +1,5 @@
 big_referrers = (
-            ('google.', 'Google'),
+            ('google.c', 'Google'),
             ('bing.com', 'Bing'),
             ('twitter.com', 'Twitter'),
             ('reddit.com', 'Reddit'),
@@ -10,7 +10,7 @@ big_referrers = (
 
 def normalize_referrer(referrer_url):
     for big_ref in big_referrers:
-        if big_ref[0] in referrer_url:
+        if referrer_url.startswith(big_ref[0]):
             return big_ref[1]
 
     return referrer_url

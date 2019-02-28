@@ -118,7 +118,7 @@ class Command(BaseCommand):
 
                         except:
                             pass
-                    raw_tracker.ip = None
+                raw_tracker.ip = None
 
                 tracker.save()
             raw_tracker.processed = True

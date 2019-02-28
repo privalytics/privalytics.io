@@ -321,7 +321,7 @@ class RawTracker(models.Model):
     dnt = models.BooleanField(default=False)
     account_id = models.CharField(max_length=15)
     ip = models.GenericIPAddressField(null=True,
-                                      blank=True)  # This field will be erased as soon as the tracker is processeed
+                                      blank=True)  # This field will be erased as soon as the tracker is processed
     user_agent = models.CharField(max_length=255, blank=True, null=True)
     processed = models.BooleanField(default=False)
     screen_width = models.IntegerField(blank=True, null=True)
@@ -329,7 +329,6 @@ class RawTracker(models.Model):
     wrong_account_id = models.BooleanField(default=False)
     website_does_not_exist = models.BooleanField(default=False)
     wrong_owner = models.BooleanField(default=False)
-
 
     def __str__(self):
         return "Raw Tracker {}".format(self.id)
