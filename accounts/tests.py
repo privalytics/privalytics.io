@@ -89,12 +89,13 @@ class SuccessfulSignUpTests(TestCase):
         }
         self.response = self.client.post(url, data)
         self.home_url = reverse('index')
+        self.account_url = reverse('account')
 
     def test_redirection(self):
         '''
-        A valid form submission should redirect the user to the home page
+        A valid form submission should redirect the user to the account page
         '''
-        self.assertRedirects(self.response, self.home_url)
+        self.assertRedirects(self.response, self.account_url)
 
     def test_user_creation(self):
         self.assertTrue(User.objects.filter(email='joh@doe.com').exists())

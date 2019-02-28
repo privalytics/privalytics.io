@@ -1,7 +1,8 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
+import pytz
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.timezone import now
+from django.utils.timezone import now, is_naive, make_aware
 from django.views import View
 
 from tracker.forms import DateRangeForm
@@ -57,6 +58,10 @@ class WebsiteStats(View):
         if form.is_valid():
             start_date = form.cleaned_data['date_range'][0]
             end_date = form.cleaned_data['date_range'][1]
+            start_date = datetime.combine(start_date, datetime.min.time())
+            end_date = datetime.combine(end_date, datetime.min.time())
+            start_date = make_aware(start_date)
+            end_date = make_aware(end_date)
             ctx = self.get_context(website, start_date, end_date)
             ctx.update({'form': form})
             return render(request, self.template_name, ctx)
