@@ -31,5 +31,6 @@ class Command(BaseCommand):
             f.write(txt)
 
         txt = render_to_string('privalytics/data_collection.html')
-        with open('static_pages/data-collection',  'w', encoding='utf-8') as f:
+
+        with open('static_pages/data-collection/index.html',  'w', encoding='utf-8') as f:
             f.write(txt)
