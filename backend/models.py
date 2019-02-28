@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.db import models
 from django.utils.timezone import now
 
@@ -53,13 +53,14 @@ class AsyncEmail(models.Model):
             self.from_email = settings.DEFAULT_FROM_EMAIL
 
         try:
-            send_mail(
+            email = EmailMessage(
                 self.subject,
                 self.msg_txt,
                 '{} <{}>'.format(self.from_name, self.from_email),
                 ['{} <{}>'.format(self.to_name, self.to_email)],
-                fail_silently=False,
             )
+            email.send(fail_silently=False)
+
             self.sent = True
             self.sent_time = now()
             self.save()
