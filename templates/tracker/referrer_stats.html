@@ -77,7 +77,7 @@
                                 </thead>
                                 {% for referrer in refs %}
                                     <tr>
-                                        <td><a href="{% url 'referrer-details' website referrer.referrer_url %}">{{ referrer.referrer_url }}</a></td>
+                                        <td><a href="{% url 'referrer-details' website.website_url referrer.referrer_url %}">{{ referrer.referrer_url }}</a></td>
                                         <td>{{ referrer.visits }}</td>
                                     </tr>
                                 {% endfor %}
