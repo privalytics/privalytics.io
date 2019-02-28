@@ -12,6 +12,7 @@ from user_agents import parse
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 import logging
 
+from util.normalize_websites import normalize_website
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,12 @@ class Command(BaseCommand):
                 continue
             parsed_url = urlparse(raw_tracker.url)
             queries = QueryDict(parsed_url.query, mutable=False)
-            url = parsed_url.hostname
+            website_url = normalize_website(parsed_url.hostname)
             page = parsed_url.path
+            if not page:
+                page = '/'
+
             utm_source = queries.get('utm_source')
-            website_url = url.lower()
-            website_url = website_url.replace('http://', '').replace('https://', '').replace('www.', '').strip('/')
             try:
                 website = Website.objects.get(website_url=website_url)
             except Website.DoesNotExist:
@@ -57,14 +59,14 @@ class Command(BaseCommand):
                 raw_tracker.save()
 
             referrer_url = None
-            referrer_page = None
+            referrer_page = '/'
             if raw_tracker.referrer:
                 parsed_referrer = urlparse(raw_tracker.referrer)
-                referrer_url = parsed_referrer.hostname
+                referrer_url = normalize_website(parsed_referrer.hostname)
                 referrer_page = parsed_referrer.path
 
             tracker = Tracker.objects.create(
-                url=url,
+                url=website_url,
                 page=page,
                 website=website,
                 referrer_url=referrer_url,

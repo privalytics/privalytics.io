@@ -23,7 +23,8 @@ from django_countries import countries
 
 class Website(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='websites')
-    website_url = models.CharField(unique=True, max_length=255, blank=False, null=False, help_text='The url of your website')
+    website_url = models.CharField(unique=True, max_length=255, blank=False, null=False,
+                                   help_text='The url of your website')
     website_name = models.CharField(max_length=255, default='', blank=True, help_text='The name of your website')
     is_public = models.BooleanField(default=False)
 
@@ -59,7 +60,7 @@ class Website(models.Model):
     def monthly_page_views(self):
         """ Calculate number of visits in the last month.
         """
-        return self.get_page_views(now()-timedelta(days=30), now())
+        return self.get_page_views(now() - timedelta(days=30), now())
 
     @property
     def visits_hour(self):
@@ -71,13 +72,13 @@ class Website(models.Model):
     def visits_day(self):
         """Calculates visits per day in the last 30 days.
         """
-        return json.dumps(self.get_daily_visits(now()-timedelta(days=30), now()), cls=DjangoJSONEncoder)
+        return json.dumps(self.get_daily_visits(now() - timedelta(days=30), now()), cls=DjangoJSONEncoder)
 
     @property
     def visits_month(self):
         """ Calculates the number of visits per month. In the last year.
         """
-        return json.dumps(self.get_daily_visits(now()-timedelta(days=365), now()))
+        return json.dumps(self.get_daily_visits(now() - timedelta(days=365), now()))
 
     @property
     def popular_pages_30_days(self):
@@ -98,20 +99,19 @@ class Website(models.Model):
     @property
     def top_referrer_week(self):
         try:
-            return self.get_top_referrers(now()-timedelta(days=7), now())[0]
+            return self.get_top_referrers(now() - timedelta(days=7), now())[0]
         except:
             return None
 
     def get_top_screen_width(self, start_date, end_date):
         screen_width = self.trackers \
-                    .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
-                    .exclude(type_device=Tracker.BOT)\
-                    .exclude(screen_height=0)\
-                    .values('screen_width')\
-                    .annotate(visits=Count('screen_width'))\
-                    .order_by('-visits')[:10]
+                           .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+                           .exclude(type_device=Tracker.BOT) \
+                           .exclude(screen_height=0) \
+                           .values('screen_width') \
+                           .annotate(visits=Count('screen_width')) \
+                           .order_by('-visits')[:10]
         return screen_width
-
 
     def get_top_pages(self, start_date, end_date):
         pages = self.trackers \
@@ -141,12 +141,12 @@ class Website(models.Model):
 
     def get_top_os(self, start_date, end_date):
         trackers = self.trackers \
-            .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
-            .exclude(type_device=Tracker.BOT) \
-            .exclude(type_device=Tracker.UNKNOWN) \
-            .values('operating_system') \
-            .annotate(number=Count('id')) \
-            .order_by('-number')[:10]
+                       .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+                       .exclude(type_device=Tracker.BOT) \
+                       .exclude(type_device=Tracker.UNKNOWN) \
+                       .values('operating_system') \
+                       .annotate(number=Count('id')) \
+                       .order_by('-number')[:10]
 
         visits_list = []
         os_list = []
@@ -170,15 +170,64 @@ class Website(models.Model):
 
         return countries_count
 
-    def get_top_referrers(self, start_date, end_date):
+    def get_top_landing_pages(self, start_date, end_date, num_pages=10):
+        landing_pages = self.trackers.exclude(referrer_url='')\
+                            .exclude(referrer_url=None)\
+                            .exclude(referrer_url__contains=self.website_url)\
+                            .values('page')\
+                            .annotate(visits=Count('id'))\
+                            .order_by('-visits')[:num_pages]
+        return landing_pages
+
+    def get_top_referrers(self, start_date, end_date, num_referrers=10):
         referrers = self.trackers.exclude(referrer_url='') \
+                        .exclude(referrer_url=None)\
                         .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
                         .exclude(referrer_url__contains=self.website_url) \
                         .values('referrer_url') \
                         .annotate(visits=Count('referrer_url')) \
-                        .order_by('-visits')[:10]
+                        .order_by('-visits')[:num_referrers]
+        referrer_list = []
+        visits_list = []
+        for ref in referrers:
+            referrer_list.append(ref['referrer_url'])
+            visits_list.append(ref['visits'])
+        return {'referrers_list': referrer_list, 'visits': visits_list}
 
-        return referrers
+    def get_top_referrer_pages(self, start_date, end_date, referrer, num_pages=20):
+        """ Gets the exact page of the referrer
+        """
+        pages = self.trackers.filter(referrer_url__contains=referrer) \
+                    .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+                    .values('referrer_page') \
+                    .annotate(visits=Count('id')) \
+                    .order_by('-visits')[:num_pages]
+        return pages
+
+    def get_top_pages_referrer(self, start_date, end_date, referrer, num_pages=20):
+        """ Gets the top landing pages by referrer """
+        pages = self.trackers.filter(referrer_url__contains=referrer)\
+                    .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+                    .values('page') \
+                    .annotate(visits=Count('id'))\
+                    .order_by('-visits')[:num_pages]
+        return pages
+
+    def get_visits_referrer(self, start_date, end_date, referrer):
+        current_results = self.trackers \
+            .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+            .exclude(type_device=Tracker.BOT) \
+            .filter(referrer_url__contains=referrer) \
+            .annotate(month=TruncDay('timestamp')) \
+            .values('month') \
+            .annotate(requests=Count('pk')).order_by('-month')
+
+        for item in current_results:
+            item['t'] = '{date}' \
+                .format(date=item.pop('month'))
+            item['y'] = item.pop('requests')
+
+        return list(current_results)
 
     def get_hourly_visits(self, start_date, end_date):
         current_results = self.trackers \
@@ -200,7 +249,7 @@ class Website(models.Model):
         current_results = self.trackers \
             .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
             .exclude(type_device=Tracker.BOT) \
-            .exclude(referrer_url__contains=self.website_url)\
+            .exclude(referrer_url__contains=self.website_url) \
             .annotate(month=TruncDay('timestamp')) \
             .values('month') \
             .annotate(requests=Count('pk')).order_by('-month')
@@ -209,9 +258,7 @@ class Website(models.Model):
             item['t'] = '{date}' \
                 .format(date=item.pop('month'))
             item['y'] = item.pop('requests')
-        #
-        # results = WebsiteViews.get_views(self, start_date.date(), end_date.date())
-        # print(results)
+
         return list(current_results)
 
     def get_uniques(self, start_date, end_date):
@@ -265,7 +312,8 @@ class RawTracker(models.Model):
     referrer = models.URLField(blank=True, null=True)
     dnt = models.BooleanField(default=False)
     account_id = models.CharField(max_length=15)
-    ip = models.GenericIPAddressField(null=True, blank=True)   # This field will be erased as soon as the tracker is processeed
+    ip = models.GenericIPAddressField(null=True,
+                                      blank=True)  # This field will be erased as soon as the tracker is processeed
     user_agent = models.CharField(max_length=255, blank=True, null=True)
     processed = models.BooleanField(default=False)
     screen_width = models.IntegerField(blank=True, null=True)
@@ -276,7 +324,6 @@ class RawTracker(models.Model):
 
     def __str__(self):
         return "Raw Tracker {}".format(self.id)
-
 
 
 class Tracker(models.Model):

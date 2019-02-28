@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 from tracker.models import Website
+from util.normalize_websites import normalize_website
 
 
 class MyUserCreationForm(UserCreationForm):
@@ -35,8 +36,8 @@ class SignUpForm(MyUserCreationForm):
 class WebsiteCreationForm(MyModelForm):
 
     def clean_website_url(self):
-        website_url = self.cleaned_data['website_url'].lower()
-        website_url = website_url.replace('http://', '').replace('https://', '').replace('www.', '').strip('/')
+        website_url = self.cleaned_data['website_url']
+        website_url = normalize_website(website_url)
         if Website.objects.filter(website_url=website_url).exists():
             raise forms.ValidationError("This website was already registered")
         return website_url

@@ -20,6 +20,12 @@ class WebsiteStats(View):
         operating_systems = website.get_top_os(start_date, end_date)
         screen_widths = website.get_top_screen_width(start_date, end_date)
 
+        # Need to do this to preserve templates
+        referrers = [{
+            'referrer_url': referrers['referrers_list'][i],
+            'visits': referrers['visits'][i]
+        } for i in range(len(referrers['referrers_list']))]
+
         ctx = {}
         ctx.update({
             'visitors': visitors,
@@ -65,3 +71,71 @@ class WebsiteStats(View):
             ctx.update({'form': form})
             return render(request, self.template_name, ctx)
         return redirect(website.get_absolute_url())
+
+
+class ReferrersView(View):
+    template_name = 'tracker/referrer_stats.html'
+
+    def get_context(self, website, start_date, end_date):
+        # Get top 10 referrers
+        referrers = website.get_top_referrers(start_date, end_date)
+        # Get top landing page
+        landing_page = website.get_top_landing_pages(start_date, end_date, 1)
+
+        ctx = {
+            'referrers': referrers,
+            'landing_page': landing_page,
+        }
+
+        refs = [{
+            'referrer_url': referrers['referrers_list'][i],
+            'visits': referrers['visits'][i]
+        } for i in range(len(referrers['referrers_list']))]
+        ctx.update({'refs': refs})
+        ctx.update({'website': website})
+        return ctx
+
+    def get(self, request, website_url):
+        start_date = now() - timedelta(days=30)
+        end_date = now()
+
+        website = get_object_or_404(Website, website_url=website_url)
+        if not website.is_public and not self.request.user.has_perm('can_view_website', website):
+            return redirect('login')
+
+        ctx = self.get_context(website, start_date, end_date)
+        ctx.update({'form': DateRangeForm(initial={'date_range': (start_date, end_date)})})
+
+        return render(request, self.template_name, ctx)
+
+
+class ReferrerDetails(View):
+    template_name = 'tracker/referrer_details.html'
+
+    def get_context(self, website, start_date, end_date, ref_name):
+        ctx = {}
+
+        visits = website.get_visits_referrer(start_date, end_date, ref_name)
+        pages = website.get_top_referrer_pages(start_date, end_date, ref_name)
+        landing_pages = website.get_top_pages_referrer(start_date, end_date, ref_name)
+
+        ctx.update({
+            'visits': visits,
+            'pages': pages,
+            'landing_pages': landing_pages
+        })
+
+        ctx.update({'website': website})
+        ctx.update({'ref_name': ref_name})
+        return ctx
+
+    def get(self, request, website_url, ref_name):
+        start_date = now() - timedelta(days=30)
+        end_date = now()
+        website = get_object_or_404(Website, website_url=website_url)
+        if not website.is_public and not self.request.user.has_perm('can_view_website', website):
+            return redirect('login')
+
+        ctx = self.get_context(website, start_date, end_date, ref_name)
+        ctx.update({'form': DateRangeForm(initial={'date_range': (start_date, end_date)})})
+        return render(request, self.template_name, ctx)

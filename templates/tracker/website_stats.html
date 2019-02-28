@@ -1,4 +1,5 @@
 {% extends 'tracker/base.html' %}
+{% load static %}
 {% block title %}Privalytics.io | Stats for {{ website }}{% endblock %}
 {% block content %}
     <!-- Begin Page Content -->
@@ -7,8 +8,8 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-{#            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i#}
-{#                    class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>#}
+            {#            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i#}
+            {#                    class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>#}
         </div>
 
         <!-- Content Row -->
@@ -254,4 +255,14 @@
         </div>
     </div>
     <!-- /.container-fluid -->
+{% endblock %}
+
+{% block extra_footer %}
+    {% include 'tracker/stats_scripts.html' %}
+    {% if countries %}
+        <script src="{% static 'vendor/data-map/topojson.js' %}"></script>
+        <script src="{% static 'vendor/data-map/d3.min.js' %}"></script>
+        <script src="{% static 'vendor/data-map/datamaps.all.min.js' %}"></script>
+        <script src="{% static 'tracker/js/world_map.js' %}"></script>
+    {% endif %}
 {% endblock %}
