@@ -15,7 +15,7 @@ class Command(BaseCommand):
             os.makedirs('static_pages/privacy')
         if not os.path.exists('static_pages/terms'):
             os.makedirs('static_pages/terms')
-        if not os.path.exists('static_pages/data-collecction'):
+        if not os.path.exists('static_pages/data-collection'):
             os.makedirs('static_pages/data-collection')
 
         txt = render_to_string('privalytics/index.html')
