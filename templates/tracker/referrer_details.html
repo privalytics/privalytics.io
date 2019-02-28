@@ -91,7 +91,7 @@
                                 </thead>
                                 {% for page in pages %}
                                     <tr>
-                                        <td>{% filter force_escape %}{{ page.page }}{% endfilter %}</td>
+                                        <td>{{ page.referrer_page }}</td>
                                         <td>{{ page.visits }}</td>
                                     </tr>
                                 {% endfor %}
