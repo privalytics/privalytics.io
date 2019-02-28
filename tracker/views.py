@@ -1,8 +1,7 @@
 from datetime import timedelta, datetime
 
-import pytz
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.timezone import now, is_naive, make_aware
+from django.utils.timezone import now, make_aware
 from django.views import View
 
 from tracker.forms import DateRangeForm

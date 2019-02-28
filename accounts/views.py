@@ -15,6 +15,7 @@ from django.views.generic import CreateView
 from django.contrib.auth import login as auth_login
 from accounts.forms import SignUpForm, WebsiteCreationForm
 from accounts.tokens import account_activation_token
+from backend.models import AsyncEmail
 from logs.models import AccountTypeSelected, TimeToStore
 from tracker.models import Website
 
@@ -47,7 +48,13 @@ class SignUpView(View):
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode('utf-8'),
                 'token': account_activation_token.make_token(user),
             })
-            user.email_user(subject, message, from_email='Privalytics <noreply@privalytics.io>')
+            # user.email_user(subject, message, from_email='Privalytics <noreply@privalytics.io>')
+            AsyncEmail.objects.create(
+                to_email=user.email,
+                to_name=user.username,
+                subject=subject,
+                msg_txt=message
+            )
             user.profile.account_selected = request.session.get('account_type')
             user.save()
             user.profile.save()

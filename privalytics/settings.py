@@ -143,3 +143,6 @@ LOGIN_URL = 'login'
 #         'rest_framework.permissions.AllowAny',
 #     )
 # }
+
+DEFAULT_FROM_NAME = 'Privalytics'
+DEFAULT_FROM_EMAIL = 'noreply@privalytics.io'

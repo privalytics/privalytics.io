@@ -1,8 +1,10 @@
 import time
 
+from django.contrib.auth.models import User
 from django.core.management import BaseCommand
 
 from accounts.models import Profile
+from backend.models import AsyncEmail
 from tracker.models import RawTracker, Tracker, Website
 from urllib.parse import urlparse
 from django.http import QueryDict
@@ -116,3 +118,18 @@ class Command(BaseCommand):
 
         t1 = time.time()
         logger.info('Processed {} logs in {}ms'.format(raw_trackers.count(), (t1-t0)*1000))
+
+        # If it takes longer than a minute to process, send a message to the admins
+        if t1-t0 > 60:
+            admins = User.objects.filter(is_superuser=True)
+            subject = "Processing Raw Tracks is too slow"
+            message = "It took {} seconds to process {} raw tracks. There may be something going on with the server." \
+                      "Consider running the management task more often, or profile the code to see the bottleneck." \
+                      "This is an automatic e-mail"
+            for admin in admins:
+                AsyncEmail.objects.create(
+                    to_name=admin.username,
+                    to_email=admin.email,
+                    msg_txt=message,
+                    subject=subject
+                )
