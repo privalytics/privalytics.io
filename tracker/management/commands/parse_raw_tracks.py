@@ -63,6 +63,10 @@ class Command(BaseCommand):
             if raw_tracker.referrer:
                 parsed_referrer = urlparse(raw_tracker.referrer)
                 referrer_url = normalize_website(parsed_referrer.hostname)
+                if 'google' in referrer_url:
+                    referrer_url = 'google'
+                if 'bing' in referrer_url:
+                    referrer_url = 'bing'
                 referrer_page = parsed_referrer.path
 
             tracker = Tracker.objects.create(

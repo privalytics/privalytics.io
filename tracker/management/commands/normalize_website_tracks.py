@@ -17,7 +17,7 @@ class Command(BaseCommand):
         for tracker in trackers:
                 tracker.referrer_url = normalize_website(tracker.referrer_url)
         trackers = Tracker.objects.exclude(url=None).exclude(url='')
-        logger.info('Going to normalize {} trackers urs'.format(trackers.count()))
+        logger.info('Going to normalize {} trackers URLS'.format(trackers.count()))
         for tracker in trackers:
             if tracker.url:
                 tracker.url = normalize_website(tracker.url)
