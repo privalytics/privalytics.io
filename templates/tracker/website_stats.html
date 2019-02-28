@@ -234,20 +234,9 @@
                     </div>
                     <div class="card shadow mb-4">
                         <div class="card-body">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <td>Screen Widths</td>
-                                    <td>Visits</td>
-                                </tr>
-                                </thead>
-                                {% for sw in screen_widths %}
-                                    <tr>
-                                        <td>{{ sw.screen_width }}</td>
-                                        <td>{{ sw.visits }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
+                            <div class="chart-area">
+                                <canvas id="screen_width"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>

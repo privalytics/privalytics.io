@@ -84,3 +84,40 @@
         },
     });
 </script>
+<script>
+    var color = Chart.helpers.color;
+    var horizontalBarChartData = {
+        labels: ['>1200px', '>992px', '>768px', '>576px', '<576px'],
+        datasets: [{
+            label: 'Screen Widths',
+            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#37ccc2', '#2fcc90'],
+            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#2baf9a', '#31af80'],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+            borderWidth: 1,
+            data: [ {{ screens.xl }}, {{ screens.lg }}, {{ screens.md }}, {{ screens.sm }}, {{ screens.xs }}]
+        }]
+
+    };
+    var ctx = document.getElementById("screen_width");
+    window.myHorizontalBar = new Chart(ctx, {
+        type: 'horizontalBar',
+        data: horizontalBarChartData,
+        options: {
+            // Elements options apply to all of the options unless overridden in a dataset
+            // In this case, we are setting the border of each horizontal bar to be 2px wide
+            elements: {
+                rectangle: {
+                    borderWidth: 2,
+                }
+            },
+            responsive: true,
+            legend: {
+                position: 'right',
+            },
+            title: {
+                display: true,
+                text: 'Chart.js Horizontal Bar Chart'
+            }
+        }
+    });
+</script>
