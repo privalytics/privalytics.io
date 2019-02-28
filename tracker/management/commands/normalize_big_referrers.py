@@ -11,7 +11,13 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        big_referrers = ('google', 'bing', 'twitter')
+        big_referrers = (
+            ('google', 'Google'),
+            ('bing', 'Bing'),
+            ('twitter', 'Twitter'),
+            ('t.com', 'Twitter'),
+            ('reddit', 'Reddit')
+        )
         for big_referrer in big_referrers:
             trackers = Tracker.objects.filter(referrer_url__contains=big_referrer)
             logger.info('Going to normalize {} referrers of {}'.format(trackers.count(), big_referrer))
