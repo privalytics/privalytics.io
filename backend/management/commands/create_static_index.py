@@ -19,17 +19,17 @@ class Command(BaseCommand):
             os.makedirs('static_pages/data-collection')
 
         txt = render_to_string('privalytics/index.html')
-        with open('static_pages/index.html', 'w') as f:
+        with open('static_pages/index.html',  'w', encoding='utf-8') as f:
             f.write(txt)
 
         txt = render_to_string('privalytics/privacy.html')
-        with open('static_pages/privacy/index.html', 'w') as f:
+        with open('static_pages/privacy/index.html',  'w', encoding='utf-8') as f:
             f.write(txt)
 
         txt = render_to_string('privalytics/terms.html')
-        with open('static_pages/terms/index.html', 'w') as f:
+        with open('static_pages/terms/index.html',  'w', encoding='utf-8') as f:
             f.write(txt)
 
         txt = render_to_string('privalytics/data_collection.html')
-        with open('static_pages/data-collection', 'w') as f:
+        with open('static_pages/data-collection',  'w', encoding='utf-8') as f:
             f.write(txt)
