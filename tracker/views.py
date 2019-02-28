@@ -108,6 +108,22 @@ class ReferrersView(View):
 
         return render(request, self.template_name, ctx)
 
+    def post(self, request, website_url):
+        website = get_object_or_404(Website, website_url=website_url)
+        if not website.is_public and not self.request.user.has_perm('can_view_website', website):
+            return redirect('login')
+        form = DateRangeForm(request.POST)
+        if form.is_valid():
+            start_date = form.cleaned_data['date_range'][0]
+            end_date = form.cleaned_data['date_range'][1]
+            start_date = datetime.combine(start_date, datetime.min.time())
+            end_date = datetime.combine(end_date, datetime.min.time())
+            start_date = make_aware(start_date)
+            end_date = make_aware(end_date)
+            ctx = self.get_context(website, start_date, end_date)
+            ctx.update({'form': form})
+            return render(request, self.template_name, ctx)
+        return redirect(website.get_absolute_url())
 
 class ReferrerDetails(View):
     template_name = 'tracker/referrer_details.html'
@@ -139,3 +155,20 @@ class ReferrerDetails(View):
         ctx = self.get_context(website, start_date, end_date, ref_name)
         ctx.update({'form': DateRangeForm(initial={'date_range': (start_date, end_date)})})
         return render(request, self.template_name, ctx)
+
+    def post(self, request, website_url, ref_name):
+        website = get_object_or_404(Website, website_url=website_url)
+        if not website.is_public and not self.request.user.has_perm('can_view_website', website):
+            return redirect('login')
+        form = DateRangeForm(request.POST)
+        if form.is_valid():
+            start_date = form.cleaned_data['date_range'][0]
+            end_date = form.cleaned_data['date_range'][1]
+            start_date = datetime.combine(start_date, datetime.min.time())
+            end_date = datetime.combine(end_date, datetime.min.time())
+            start_date = make_aware(start_date)
+            end_date = make_aware(end_date)
+            ctx = self.get_context(website, start_date, end_date, ref_name)
+            ctx.update({'form': form})
+            return render(request, self.template_name, ctx)
+        return redirect(website.get_absolute_url())
