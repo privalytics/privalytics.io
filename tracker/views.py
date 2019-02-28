@@ -1,5 +1,6 @@
 from datetime import timedelta, datetime
 
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now, make_aware
 from django.views import View
@@ -19,7 +20,20 @@ class WebsiteStats(View):
         devices = website.get_top_devices(start_date, end_date)
         operating_systems = website.get_top_os(start_date, end_date)
         screen_widths = website.get_top_screen_width(start_date, end_date)
+        screen_width = website.get_screen_width(start_date, end_date)
 
+        xl = screen_width.filter(screen_width__gte=1200).count()
+        lg = screen_width.filter(screen_width__gte=992, screen_width__lt=1200).count()
+        md = screen_width.filter(screen_width__gte=768, screen_width__lt=992).count()
+        sm = screen_width.filter(screen_width__gte=576, screen_width__lt=768).count()
+        xs = screen_width.filter(screen_width__lt=576).count()
+        screens = {
+            'xl': xl,
+            'lg': lg,
+            'md': md,
+            'sm': sm,
+            'xs': xs
+        }
         # Need to do this to preserve templates
         referrers = [{
             'referrer_url': referrers['referrers_list'][i],
@@ -35,6 +49,7 @@ class WebsiteStats(View):
             'devices': devices,
             'operating_systems': operating_systems,
             'screen_widths': screen_widths,
+            'screens': screens
         })
         ctx.update({'website': website})
 

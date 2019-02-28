@@ -330,6 +330,7 @@ class RawTracker(models.Model):
     website_does_not_exist = models.BooleanField(default=False)
     wrong_owner = models.BooleanField(default=False)
 
+
     def __str__(self):
         return "Raw Tracker {}".format(self.id)
 
@@ -382,6 +383,8 @@ class Tracker(models.Model):
     referrer_url = models.CharField(blank=True, null=True, max_length=255)
     # The page from which the visitor came from. Everything from the first '/'
     referrer_page = models.CharField(max_length=255, blank=True, null=True)
+
+    raw_tracker = models.ForeignKey(RawTracker, on_delete=models.CASCADE, null=True, default=None)
 
     @classmethod
     def create_from_json(cls, request, data):

@@ -3,6 +3,8 @@ import logging
 from django.core.management import BaseCommand
 
 from tracker.models import Tracker
+from util.normalize_referrers import big_referrers
+
 logger = logging.getLogger(__name__)
 
 
@@ -11,13 +13,6 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        big_referrers = (
-            ('google', 'Google'),
-            ('bing', 'Bing'),
-            ('twitter', 'Twitter'),
-            ('t.com', 'Twitter'),
-            ('reddit', 'Reddit')
-        )
         for big_referrer in big_referrers:
             trackers = Tracker.objects.filter(referrer_url__contains=big_referrer[0])
             logger.info('Going to normalize {} referrers of {}'.format(trackers.count(), big_referrer[0]))

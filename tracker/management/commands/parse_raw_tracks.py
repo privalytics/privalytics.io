@@ -12,6 +12,7 @@ from user_agents import parse
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 import logging
 
+from util.normalize_referrers import normalize_referrer
 from util.normalize_websites import normalize_website
 
 logger = logging.getLogger(__name__)
@@ -62,7 +63,7 @@ class Command(BaseCommand):
             referrer_page = '/'
             if raw_tracker.referrer:
                 parsed_referrer = urlparse(raw_tracker.referrer)
-                referrer_url = normalize_website(parsed_referrer.hostname)
+                referrer_url = normalize_referrer(normalize_website(parsed_referrer.hostname))
                 if 'google' in referrer_url:
                     referrer_url = 'google'
                 if 'bing' in referrer_url:
@@ -77,6 +78,7 @@ class Command(BaseCommand):
                 referrer_page=referrer_page,
                 timestamp=raw_tracker.timestamp,
                 utm_source=utm_source,
+                raw_tracker=raw_tracker,
             )
 
             if not raw_tracker.dnt:
