@@ -145,4 +145,4 @@ LOGIN_URL = 'login'
 # }
 
 DEFAULT_FROM_NAME = 'Privalytics'
-DEFAULT_FROM_EMAIL = 'noreply@privalytics.io'
+DEFAULT_FROM_EMAIL = 'contact@privalytics.io'
