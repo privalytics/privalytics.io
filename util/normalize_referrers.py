@@ -2,7 +2,7 @@ big_referrers = (
             ('google.', 'Google'),
             ('bing.com', 'Bing'),
             ('twitter.com', 'Twitter'),
-            ('t.com', 'Twitter'),
+            ('t.co', 'Twitter'),
             ('reddit.com', 'Reddit'),
             ('duckduckgo.com', 'DuckDuckGo')
         )
