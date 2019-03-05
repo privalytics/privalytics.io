@@ -78,10 +78,6 @@ class WebsiteStats(View):
         if form.is_valid():
             start_date = form.cleaned_data['date_range'][0]
             end_date = form.cleaned_data['date_range'][1]
-            start_date = datetime.combine(start_date, datetime.min.time())
-            end_date = datetime.combine(end_date, datetime.min.time())
-            start_date = make_aware(start_date)
-            end_date = make_aware(end_date)
             ctx = self.get_context(website, start_date, end_date)
             ctx.update({'form': form})
             return render(request, self.template_name, ctx)
