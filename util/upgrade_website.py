@@ -11,6 +11,7 @@ sudo_pass = getpass.getpass("What's your sudo remote password? ")
 config = Config(overrides={'sudo': {'password': sudo_pass}})
 
 c = Connection('digital', config=config)
+
 with c.cd(f'/webapps/{project_name}/Privalytics/website'):
     c.run('git pull')
     c.run('../../venv/bin/pip install -r requirements.txt')

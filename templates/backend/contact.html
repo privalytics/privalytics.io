@@ -1,6 +1,6 @@
 {% extends 'privalytics/base.html' %}
 {% load static %}
-
+{% block title %}Privalytics.io | Contact Us{% endblock %}
 {% block custom_css %}
     <link href="{% static 'privalytics/css/signup.css' %}" rel="stylesheet">
 {% endblock %}
@@ -11,11 +11,11 @@
                 <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
                     <div class="card card-signin my-5">
                         <div class="card-body">
-                            <h5 class="card-title text-center">Login</h5>
-                            <form class="form-signin" method="post" novalidate action="{% url 'login' %}">
+                            <h5 class="card-title text-center">Contact Us</h5>
+                            <form class="form-signin" method="post" novalidate>
                                 {% csrf_token %}
                                 {% include 'includes/form.html' %}
-                                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign Up
+                                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Send your message
                                 </button>
                             </form>
                         </div>
