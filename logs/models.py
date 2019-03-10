@@ -35,3 +35,10 @@ class TimeToStore(models.Model):
 
     def __str__(self):
         return "{} - Time: {:2.3f}ms".format(self.measured_type, 1000*self.measured_time)
+
+
+class MessagesToAdmin(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
+    read = models.BooleanField(default=False)
+    read_on = models.DateTimeField(auto_now_add=False, null=True)

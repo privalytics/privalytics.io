@@ -7,4 +7,5 @@ admin.site.register((
     SupportMessage,
     AccountTypes,
     AsyncEmail,
+
 ))

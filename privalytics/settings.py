@@ -4,9 +4,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag')
 
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+# DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -22,6 +23,7 @@ INSTALLED_APPS = [
     'logs.apps.LogsConfig',
     'accounts.apps.AccountsConfig',
     'backend.apps.BackendConfig',
+    'subscriptions.apps.SubscriptionsConfig',
     'django_user_agents',
     'corsheaders',
     'widget_tweaks',
@@ -135,7 +137,7 @@ CORS_ALLOW_METHODS = (
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 LOGOUT_REDIRECT_URL = 'index'
-LOGIN_REDIRECT_URL = 'account'
+LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'
 
 # REST_FRAMEWORK = {
@@ -146,3 +148,9 @@ LOGIN_URL = 'login'
 
 DEFAULT_FROM_NAME = 'Privalytics'
 DEFAULT_FROM_EMAIL = 'contact@privalytics.io'
+
+WEBSITE_URL = 'www.privalytics.io'
+
+STRIPE_LIVE = False # Whether to use stripe test or live mode
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')

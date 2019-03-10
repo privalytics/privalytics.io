@@ -45,3 +45,17 @@ class WebsiteCreationForm(MyModelForm):
     class Meta:
         model = Website
         fields = ('website_url', 'website_name')
+
+
+class ContactInformation(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')
+
+    def save(self, commit=True):
+        if 'email' in self.changed_data:
+            self.instance.profile.email_validated = False
+            self.instance.profile.save()
+        user = super(ContactInformation, self).save(commit)
+        user.profile.send_activation_email()
+        return user

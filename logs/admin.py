@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from logs.models import TimeToStore, AccountTypeSelected
+from logs.models import TimeToStore, AccountTypeSelected, MessagesToAdmin
 
-admin.site.register((TimeToStore,
-                     AccountTypeSelected))
+admin.site.register((
+    TimeToStore,
+    AccountTypeSelected,
+    MessagesToAdmin,
+))

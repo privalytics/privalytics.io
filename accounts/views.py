@@ -11,11 +11,12 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.timezone import now
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, FormView, UpdateView
 from django.contrib.auth import login as auth_login
-from accounts.forms import SignUpForm, WebsiteCreationForm
+from accounts.forms import SignUpForm, WebsiteCreationForm, ContactInformation
+from accounts.models import Profile, Subscription
 from accounts.tokens import account_activation_token
-from backend.models import AsyncEmail
+from backend.models import AsyncEmail, AccountTypes
 from logs.models import AccountTypeSelected, TimeToStore
 from tracker.models import Website
 
@@ -40,26 +41,12 @@ class SignUpView(View):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            current_site = get_current_site(request)
-            subject = 'Activate Your Privalytics Account'
-            message = render_to_string('emails/account_activation.txt', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode('utf-8'),
-                'token': account_activation_token.make_token(user),
-            })
-            # user.email_user(subject, message, from_email='Privalytics <noreply@privalytics.io>')
-            AsyncEmail.objects.create(
-                to_email=user.email,
-                to_name=user.username,
-                subject=subject,
-                msg_txt=message
-            )
             user.profile.account_selected = request.session.get('account_type')
             user.save()
             user.profile.save()
+            user.profile.send_activation_link(current_site = get_current_site(request).domain)
             auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('account')
+            return redirect('dashboard')
         return render(request, self.template_name, {'form': form})
 
 
@@ -77,7 +64,7 @@ class ActivateView(View):
             user.profile.email_validated_date = now()
             user.save()
             auth_login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('account')
+            return redirect('dashboard')
         else:
             return render(self.request, 'accounts/activation_failed.html')
 
@@ -86,22 +73,18 @@ class DashboardView(LoginRequiredMixin, View):
     login_url = '/login'
 
     def get(self, request):
-        t0 = time.time()
         ctx = {}
         websites = request.user.websites.all()
         account_id = request.user.profile.account_id
         ctx.update({'websites': websites, 'account_id': account_id})
-        result = render(request, 'accounts/dashboard.html', ctx)
-        t1 = time.time()
-        TimeToStore.objects.create(measured_time=t1-t0, measured_type=TimeToStore.MAKE_DASHBOARD)
-        return result
+        return render(request, 'accounts/dashboard.html', ctx)
 
 
 class CreateWebsite(LoginRequiredMixin, CreateView):
     model = Website
     form_class = WebsiteCreationForm
     template_name = 'accounts/new_website.html'
-    success_url = reverse_lazy('account')
+    success_url = reverse_lazy('dashboard')
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -115,4 +98,56 @@ class CreateWebsite(LoginRequiredMixin, CreateView):
             website.save()
             return redirect('account')
         return render(request, self.template_name, {'form': form})
+
+
+class AccountView(LoginRequiredMixin, UpdateView):
+    template_name = 'accounts/account.html'
+    model = User
+    form_class = ContactInformation
+    success_url = reverse_lazy('account')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        ctx = super(AccountView, self).get_context_data(**kwargs)
+        account_type = self.request.user.profile.account_type
+        account_type = Profile.ACCOUNT_TYPES[account_type][1]
+        website_count = self.request.user.websites.count()
+        website_total = self.request.user.profile.max_websites
+        views_count = self.request.user.profile.monthly_views
+        views_total = self.request.user.profile.maximum_views
+        geoip_active = self.request.user.profile.can_geolocation
+
+        ctx.update({
+            'account_type': account_type,
+            'website_count': website_count,
+            'website_total': website_total,
+            'views_count': views_count,
+            'views_total': views_total,
+            'geoip_active': geoip_active
+        })
+        return ctx
+
+
+    # def get(self, request):
+    #     return render(request, self.template_name, ctx)
+    #
+    #
+    # def post(self, request):
+    #     form = ContactInformation(request.POST, instance=request.user)
+    #     if form.is_valid():
+    #         form.save()
+    #         return redirect(reverse_lazy('account'))
+    #     return render(request, self.template_name)
+
+class SubscriptionView(LoginRequiredMixin, View):
+    template_name = 'accounts/subscription.html'
+
+    def get(self, request):
+        subscriptions = Subscription.objects.filter(user=self.request.user)
+        ctx = {
+            'subscriptions': subscriptions
+        }
+        return render(request, self.template_name, ctx)
 

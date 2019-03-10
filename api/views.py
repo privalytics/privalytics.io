@@ -15,6 +15,7 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # To not perform the csrf check previously happening
 
+
 class TrackerView(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication,)
     def post(self, request):
