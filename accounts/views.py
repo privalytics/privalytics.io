@@ -1,23 +1,18 @@
-import time
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.shortcuts import render, redirect
-from django.template.loader import render_to_string
 from django.urls import reverse_lazy
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.utils.timezone import now
 from django.views import View
-from django.views.generic import CreateView, FormView, UpdateView
+from django.views.generic import CreateView, UpdateView, DetailView
 from django.contrib.auth import login as auth_login
 from accounts.forms import SignUpForm, WebsiteCreationForm, ContactInformation
-from accounts.models import Profile, Subscription
+from accounts.models import Subscription
 from accounts.tokens import account_activation_token
-from backend.models import AsyncEmail, AccountTypes
-from logs.models import AccountTypeSelected, TimeToStore
 from tracker.models import Website
 
 
@@ -26,25 +21,17 @@ class SignUpView(View):
 
     def get(self, request, account_type=None):
         form = SignUpForm()
-        if account_type:
-            if account_type == "basic":
-                AccountTypeSelected.objects.create(account_type=AccountTypeSelected.BASIC)
-            elif account_type == 'advanced':
-                AccountTypeSelected.objects.create(account_type=AccountTypeSelected.ADVANCED)
-            else:
-                AccountTypeSelected.objects.create(account_type=AccountTypeSelected.OTHER)
-            request.session['account_type'] = account_type
-            print(request.session.get('account_type'))
+        request.session['account_type'] = account_type
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.profile.account_selected = request.session.get('account_type')
+            user.profile.account_selected_signup = request.session.get('account_type')
             user.save()
             user.profile.save()
-            user.profile.send_activation_link(current_site = get_current_site(request).domain)
+            user.profile.send_activation_email(current_site=get_current_site(request).domain)
             auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('dashboard')
         return render(request, self.template_name, {'form': form})
@@ -90,20 +77,20 @@ class CreateWebsite(LoginRequiredMixin, CreateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             total_websites = request.user.websites.count()
-            if total_websites >= request.user.profile.max_websites:
-                form.errors[NON_FIELD_ERRORS] = ['You can\'t register more websites']
-                return render(request, self.template_name, {'form': form})
+            if request.user.profile.max_websites:
+                if total_websites >= request.user.profile.max_websites:
+                    form.errors[NON_FIELD_ERRORS] = ['You can\'t register more websites']
+                    return render(request, self.template_name, {'form': form})
             website = form.save(commit=False)
             website.owner = request.user
             website.save()
-            return redirect('account')
+            return redirect('dashboard')
         return render(request, self.template_name, {'form': form})
 
 
-class AccountView(LoginRequiredMixin, UpdateView):
+class AccountView(LoginRequiredMixin, DetailView):
     template_name = 'accounts/account.html'
     model = User
-    form_class = ContactInformation
     success_url = reverse_lazy('account')
 
     def get_object(self, queryset=None):
@@ -112,7 +99,6 @@ class AccountView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         ctx = super(AccountView, self).get_context_data(**kwargs)
         account_type = self.request.user.profile.account_type
-        account_type = Profile.ACCOUNT_TYPES[account_type][1]
         website_count = self.request.user.websites.count()
         website_total = self.request.user.profile.max_websites
         views_count = self.request.user.profile.monthly_views
@@ -129,17 +115,6 @@ class AccountView(LoginRequiredMixin, UpdateView):
         })
         return ctx
 
-
-    # def get(self, request):
-    #     return render(request, self.template_name, ctx)
-    #
-    #
-    # def post(self, request):
-    #     form = ContactInformation(request.POST, instance=request.user)
-    #     if form.is_valid():
-    #         form.save()
-    #         return redirect(reverse_lazy('account'))
-    #     return render(request, self.template_name)
 
 class SubscriptionView(LoginRequiredMixin, View):
     template_name = 'accounts/subscription.html'

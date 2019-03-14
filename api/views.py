@@ -1,5 +1,3 @@
-import time
-
 from ipware.ip import get_real_ip
 
 from rest_framework import status
@@ -8,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializer import TrackerSerializer
-from logs.models import TimeToStore
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):

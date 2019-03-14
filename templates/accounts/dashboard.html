@@ -2,8 +2,7 @@
 {% block custom_css %}
     <style type="text/css">
         .table-wrapper {
-            {#width: 700px;#}
-            margin: 30px auto;
+        {#width: 700px;#} margin: 30px auto;
             background: #fff;
             padding: 20px;
             box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
@@ -131,18 +130,24 @@
                         <td>Visits 24 hours</td>
                     </tr>
                     </thead>
-                    {% for website in websites %}
-                        <tr>
-                            <td><a href="{% url 'website' website.website_url %}">{{ website }}</a></td>
-                            <td>{{ website.monthly_unique }}</td>
-                            <td>{{ website.weekly_visits }}</td>
-                            <td>{{ website.daily_visits }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                    {% if websites %}
+                        {% for website in websites %}
+                            <tr>
+                                <td><a href="{% url 'website' website.website_url %}">{{ website }}</a></td>
+                                <td>{{ website.monthly_unique }}</td>
+                                <td>{{ website.weekly_visits }}</td>
+                                <td>{{ website.daily_visits }}</td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    {% else %}
+                        </table>
+                        You have no websites registered yet. <a href="{% url 'create-website' %}">Add one</a>
+                    {% endif %}
             </div>
             <div class="d-flex justify-content-center">
-                <h5>Include the following code on the websites you would like to track, before the <code>&lt;/body&gt;</code> tag:</h5>
+                <h5>Include the following code on the websites you would like to track, before the
+                    <code>&lt;/body&gt;</code> tag:</h5>
             </div>
             <div class="d-flex justify-content-center">
                 <div class="col-md-7">

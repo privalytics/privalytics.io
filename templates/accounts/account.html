@@ -1,8 +1,39 @@
-{% extends 'privalytics/base.html' %}
-{% block content %}
-    <section id="account">
-    <div class="container">
-        <h1>Your account</h1>
-    </div>
+{% extends 'accounts/account_base.html' %}
+{% block account_content %}
+    <section id="account-overview" class="section">
+        <div class="container">
+            <header class="section-header">
+                <h2>Account overview</h2>
+            </header>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Account summary</h5>
+                    <p>Your current account type is <b>{{ account_type }}</b></p>
+                    <p>You currently have registered <b>{{ website_count }} out
+                        of {{ website_total }}</b> websites.</p>
+                    <p>Last month view count was <b>{{ views_count }}</b> and the limit for your account
+                        is <b>{{ views_total }}</b></p>
+                    <p>GeoIP is currently <b>{% if geoip_active %}active{% else %}inactive{% endif %}</b></p>
+                    <div class="text-center">
+                        <a href="{% url 'subscriptions' %}">
+                            <button class="btn btn-lg btn-primary" type="submit">Upgrade your account</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Contact Information</h5>
+                    <form class="col-lg-6 p-6  bg-gray rounded" method="POST">
+                        {% csrf_token %}
+                        {% include 'includes/form.html' %}
+
+                        <div class="text-center">
+                            <button class="btn btn-lg btn-primary" type="submit">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </section>
 {% endblock %}

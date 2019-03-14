@@ -1,0 +1,116 @@
+{% extends 'accounts/account_base.html' %}
+{% load static %}
+{% block account_content %}
+    <section class="section">
+        <div class="container">
+            <header class="section-header">
+                <h2>Add a new subscription to your account</h2>
+                <hr>
+                <p class="lead">Choose the subscription that better suits your needs.</p>
+            </header>
+
+            <div class="row gap-y text-center">
+                <div class="col-md-4">
+                    <div class="pricing-1">
+                        <p class="plan-name">Geo</p>
+                        <br>
+                        <h2 class="price">
+                            <span class="price-unit">$</span>
+                            <span>1</span>
+                        </h2>
+                        <p class="small text-lighter">
+                            Billed yearly
+                        </p>
+
+                        <div class="text-muted">
+                            <small>Geolocation on any account</small>
+                            <br>
+                        </div>
+
+                        <br>
+                        <p class="text-center py-3">
+                            <a href="{% url 'new-subscription' 'geo' %}"><button class="btn btn-primary">Get started</button></a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="pricing-1 popular">
+                        <p class="plan-name">Blogger</p>
+                        <br>
+                        <h2 class="price text-success">
+                            <span class="price-unit">$</span>
+                            <span>3</span>
+                        </h2>
+                        <p class="small text-lighter">
+                            Billed yearly
+                        </p>
+
+                        <div class="text-muted">
+                            <small>Unlimited websites</small>
+                            <br>
+                            <small>100k visits/month</small>
+                            <br>
+                            <small>6-month statistics</small>
+                            <br>
+                        </div>
+
+                        <br>
+                        <p class="text-center py-3">
+                            <a href="{% url 'new-subscription' 'blogger' %}"><button class="btn btn-primary">Get started</button></a>
+                        </p>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="pricing-1">
+                        <p class="plan-name">Advanced</p>
+                        <br>
+                        <h2 class="price">
+                            <span class="price-unit">$</span>
+                            <span>6</span>
+                        </h2>
+                        <p class="small text-lighter">
+                            Billed yearly
+                        </p>
+
+                        <div class="text-muted">
+                            <small>Unlimited websites</small>
+                            <br>
+                            <small>1M visits/month</small>
+                            <br>
+                            <small>1 year statistics</small>
+                            <br>
+                            <small>Geolocation</small>
+                            <br>
+                        </div>
+
+                        <br>
+                        <p class="text-center py-3">
+                            <a href="{% url 'new-subscription' 'advanced' %}"><button class="btn btn-primary">Get started</button></a>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+    </section>
+    <section class="section">
+        <div class="container">
+            <div class="row gap-y align-items-center">
+                <div class="col-md-6 text-center">
+                    <img src="{% static 'assets/img/undraw_contact_us_15o2.png' %}" alt="...">
+                </div>
+
+                <div class="col-md-6 text-center text-md-left">
+                    <h2>Do you need some help?</h2>
+                    <p class="lead mb-6">From a custom solution to a feature request</p>
+                    <p><a class="btn btn-lg btn-round btn-info" href="{% url 'support' %}">Send us a message</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

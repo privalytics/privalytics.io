@@ -1,9 +1,14 @@
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from mailer.engine import send_all
 
 from accounts.forms import SignUpForm
 from accounts.models import Profile
+from accounts.tokens import account_activation_token
 
 
 class SignUpTest(TestCase):
@@ -89,13 +94,20 @@ class SuccessfulSignUpTests(TestCase):
         }
         self.response = self.client.post(url, data)
         self.home_url = reverse('index')
-        self.account_url = reverse('account')
+        self.account_url = reverse('dashboard')
 
     def test_redirection(self):
         '''
         A valid form submission should redirect the user to the account page
         '''
         self.assertRedirects(self.response, self.account_url)
+
+    def test_email_sent(self):
+        send_all()  # Django-mailer to send all messages
+        self.assertGreater(len(mail.outbox), 0)
+        for msg in mail.outbox:
+            if msg.to[0] == 'joh@doe.com':
+                self.assertEqual(msg.subject, 'Activate Your Privalytics Account')
 
     def test_user_creation(self):
         self.assertTrue(User.objects.filter(email='joh@doe.com').exists())
@@ -109,3 +121,11 @@ class SuccessfulSignUpTests(TestCase):
         response = self.client.get(self.home_url)
         user = response.context.get('user')
         self.assertTrue(user.is_authenticated)
+
+    def test_activation(self):
+        user = User.objects.get(email='joh@doe.com')
+        token = account_activation_token.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk)).decode('utf-8')
+        response = self.client.get(reverse('activate', args=(uid, token)))
+        self.assertRedirects(response, reverse('dashboard'))
+

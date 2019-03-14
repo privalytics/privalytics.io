@@ -2,16 +2,12 @@ from datetime import timedelta
 
 import stripe
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.http import HttpResponse
 from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import Subscription
-from logs.models import MessagesToAdmin
-from subscriptions.models import StripePaymentIntent
+from subscriptions.models import StripePaymentIntent, Subscription
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -32,8 +28,8 @@ class ValidateSubscription(APIView):
             try:
                 payment_db = StripePaymentIntent.objects.get(payment_intent_id=id)
             except StripePaymentIntent.DoesNotExist:
-                MessagesToAdmin.objects.create(message=f"Received a post request for payment intent with id {id}"
-                                               f"but it is not registered on the database")
+                # MessagesToAdmin.objects.create(message=f"Received a post request for payment intent with id {id}"
+                #                                f"but it is not registered on the database")
                 return Response('')
 
             if payment_db.amount == pi.amount_received:
@@ -45,8 +41,8 @@ class ValidateSubscription(APIView):
                 payment_db.payed_on = now()
                 payment_db.payed = True
                 payment_db.save()
-                MessagesToAdmin.objects.create(message=f"New subscription {payment_db.subscription} for {payment_db.user} created.")
-            else:
-                MessagesToAdmin.objects.create(message=f"Payment on DB has a value of {payment_db.amount} while "
-                                               f"the payment intent received is of {pi.amount_received}")
+                payment_db.user.profile.max_websites = payment_db.subscription.max_websites
+                payment_db.user.profile.maximum_views = payment_db.subscription.max_visits
+                payment_db.user.profile.can_geolocation = payment_db.subscription.can_geolocation
+                payment_db.user.profile.save()
         return Response('')

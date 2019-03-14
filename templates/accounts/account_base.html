@@ -1,0 +1,28 @@
+{% extends 'privalytics/base.html' %}
+{% block navbar %}
+    {% include 'accounts/accounts_navbar.html' %}
+{% endblock %}
+
+{% block footer %}
+    {% include 'privalytics/index_footer.html' %}
+{% endblock %}
+{% block content %}
+    <section class="section bg-gray overflow-hidden p-0" id="account">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <aside class="sidebar">
+                        <ul class="nav nav-sidebar nav-sidebar-hero nav-sidebar-pill">
+                            <li class="nav-item"><a class="nav-link" href="{% url 'account' %}">Account</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'subscription' %}">Subscription</a></li>
+                        </ul>
+                    </aside>
+                </div>
+                <div class="col-md-9">
+                    {% block account_content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

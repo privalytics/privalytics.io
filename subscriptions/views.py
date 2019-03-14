@@ -4,39 +4,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import View
+from django.views.generic import TemplateView
+
 from subscriptions.models import SubscriptionType, StripeCustomer, StripePaymentIntent
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-class AddSubscription(LoginRequiredMixin, View):
+class AddSubscription(LoginRequiredMixin, TemplateView):
     template_name = 'subscriptions/new_subscription.html'
-
-    def get(self, request):
-        customer_email = self.request.user.email
-        geo = SubscriptionType.objects.get(slug='geo')
-        blogger = SubscriptionType.objects.get(slug='blogger')
-        advanced = SubscriptionType.objects.get(slug='advanced')
-
-        if settings.STRIPE_LIVE:
-            geo_plan = geo.stripe_id
-            blogger_plan = blogger.stripe_id
-            advanced_plan = advanced.stripe_id
-        else:
-            geo_plan = geo.stripe_test_id
-            blogger_plan = blogger.stripe_test_id
-            advanced_plan = advanced.stripe_test_id
-
-        stripe_key = settings.STRIPE_PUBLISHABLE_KEY
-
-        ctx = dict(
-            customer_email=customer_email,
-            geo_plan=geo_plan,
-            blogger_plan=blogger_plan,
-            advanced_plan=advanced_plan,
-            stripe_key=stripe_key
-        )
-        return render(request, self.template_name, ctx)
 
 
 class NewSubscription(View):

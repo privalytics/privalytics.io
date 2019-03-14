@@ -1,0 +1,141 @@
+{% extends 'accounts/account_base.html' %}
+{% block custom_css %}
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        .StripeElement {
+            box-sizing: border-box;
+            height: 40px;
+            padding: 10px 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 #e6ebf1;
+            -webkit-transition: box-shadow 150ms ease;
+            transition: box-shadow 150ms ease;
+        }
+
+        .StripeElement--focus {
+            box-shadow: 0 1px 3px 0 #cfd7df;
+        }
+
+        .StripeElement--invalid {
+            border-color: #fa755a;
+        }
+
+        .StripeElement--webkit-autofill {
+            background-color: #fefde5 !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <section id="checkout" class="section">
+        <div class="container">
+            <header class="section-header">
+                <h2>Select your payment method</h2>
+                <hr/>
+            </header>
+            <div class="row">
+                <div class="accordion accordion-connected" id="accordion-2">
+                    <div class="card">
+                        <h5 class="card-title">
+                            <a data-toggle="collapse" href="#collapse-2-1">Credit Card</a>
+                        </h5>
+                        <div id="collapse-2-1" class="collapse show" data-parent="#accordion-2">
+                        <p class="lead p-1">You are going to submit a payment of {{ subscription.yearly_price }}U$ for a yearly
+                            subscription to {{ subscription.name }}</p>
+                       <p class="p-1">All payments are securely handled by <b>Stripe</b></p>
+
+                            <div class="card-body">
+                                <div class="form">
+                                    <div class="form-group">
+                                        <label for="cardholder-name">
+                                            Name on card
+                                        </label>
+                                        <input class="form-control" id="cardholder-name" type="text"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="card-element">
+                                            Credit or debit card
+                                        </label>
+                                        <div id="card-element">
+                                            <!-- A Stripe Element will be inserted here. -->
+                                        </div>
+                                    </div>
+                                    <!-- Used to display form errors. -->
+                                    <div id="card-errors" class="text-danger" role="alert"></div>
+                                    <button id="card-button" class="btn btn-primary" data-secret="{{ client_secret }}">
+                                        Submit Payment
+                                    </button>
+                                    <div id="card-success" class="text-success" role="alert"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card">
+                        <h5 class="card-title">
+                            <a class="collapsed" data-toggle="collapse" href="#collapse-2-2">Paypal</a>
+                        </h5>
+
+                        <div id="collapse-2-2" class="collapse" data-parent="#accordion-2">
+                            <div class="card-body">
+                                Currently is only possible to pay with credit card. Would like us to add Paypal as an option? <a href="{% url 'support' %}">Send us a message!</a>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card">
+                        <h5 class="card-title">
+                            <a class="collapsed" data-toggle="collapse" href="#collapse-2-3">SEPA</a>
+                        </h5>
+
+                        <div id="collapse-2-3" class="collapse" data-parent="#accordion-2">
+                            <div class="card-body">
+                                Do you live in Europe and would like to pay by bank transfer? <a href="{% url 'support' %}">Send us a message!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block footer_scripts %}
+    <script>
+        var stripe = Stripe('{{ stripe_key }}', {
+            betas: ['payment_intent_beta_3']
+        });
+
+        var elements = stripe.elements();
+        var cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+
+        var cardholderName = document.getElementById('cardholder-name');
+        var cardButton = document.getElementById('card-button');
+        var clientSecret = cardButton.dataset.secret;
+        var error_div = document.getElementById('card-errors');
+        var success_div = document.getElementById('card-success');
+        cardButton.addEventListener('click', function (ev) {
+            cardButton.disabled = true;
+            error_div.innerHTML = '';
+            stripe.handleCardPayment(
+                clientSecret, cardElement, {
+                    source_data: {
+                        owner: {name: cardholderName.value}
+                    }
+                }
+            ).then(function (result) {
+                if (result.error) {
+
+                    error_div.innerHTML = result.error['message'];
+                    cardButton.disabled = false;
+                } else {
+                    success_div.innerHTML = "<p><i class=\"fa fa-check-circle\"> Thank you for your payment!</p>"
+                    $.post('/subscriptions/validate', result['paymentIntent']);
+                }
+            });
+        });
+    </script>
+{% endblock %}

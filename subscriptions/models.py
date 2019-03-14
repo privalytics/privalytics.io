@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
+from django.utils.timezone import now
 
 
 class SubscriptionType(models.Model):
@@ -23,6 +24,21 @@ class SubscriptionType(models.Model):
     def save(self, **kwargs):
         self.slug = slugify(self.name)
         super(SubscriptionType, self).save(**kwargs)
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    expiration_date = models.DateTimeField(auto_now_add=False, null=True)
+    subscription_date = models.DateTimeField(auto_now_add=True, null=False)
+    subscription_type = models.ForeignKey(SubscriptionType, null=False, on_delete=models.CASCADE)
+    subscription_name = models.CharField(max_length=20, null=False)
+
+    @property
+    def is_valid(self):
+        return self.expiration_date > now()
+
+    def __str__(self):
+        return f"{self.is_valid} - {self.user} subscription {self.subscription_name}"
 
 
 class StripeCustomer(models.Model):
