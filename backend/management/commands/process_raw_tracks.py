@@ -130,7 +130,7 @@ class Command(BaseCommand):
 
                     tracker.save()
 
-                    if profile.can_geolocation and not user_agent.is_bot:
+                    if profile.can_geolocation and not type_device in (Tracker.UNKNOWN, Tracker.BOT):
                         if raw_tracker.ip:
                             geo = GeoIP2()
                             try:
