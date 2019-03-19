@@ -5,7 +5,6 @@ from django.core.mail import mail_admins
 from django.core.management import BaseCommand
 
 from accounts.models import Profile
-from backend.models import AsyncEmail
 from tracker.models import RawTracker, Tracker, Website
 from urllib.parse import urlparse
 from django.http import QueryDict
@@ -83,7 +82,11 @@ class Command(BaseCommand):
             )
 
             if not raw_tracker.dnt:
-                user_agent = parse(raw_tracker.user_agent)
+                try:
+                    user_agent = parse(raw_tracker.user_agent)
+                except:
+                    logger.error('Problem parsing user agent Raw Tracker {}'.format(raw_tracker.id))
+                    user_agent = ''
                 operating_system = user_agent.os.family
                 device_family = user_agent.device.family
                 browser = user_agent.browser.family
