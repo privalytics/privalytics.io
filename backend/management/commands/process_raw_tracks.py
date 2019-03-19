@@ -104,33 +104,34 @@ class Command(BaseCommand):
                         user_agent = parse(raw_tracker.user_agent)
                     except:
                         logger.error('Problem parsing user agent Raw Tracker {}'.format(raw_tracker.id))
-                        user_agent = ''
-                    operating_system = user_agent.os.family
-                    device_family = user_agent.device.family
-                    browser = user_agent.browser.family
-
-                    if user_agent.is_mobile:
-                        type_device = Tracker.MOBILE
-                    elif user_agent.is_tablet:
-                        type_device = Tracker.TABLET
-                    elif user_agent.is_pc:
-                        type_device = Tracker.PC
-                    elif user_agent.is_bot:
-                        type_device = Tracker.BOT
-                    else:
+                        user_agent = None
                         type_device = Tracker.UNKNOWN
+                    if user_agent:
+                        operating_system = user_agent.os.family
+                        device_family = user_agent.device.family
+                        browser = user_agent.browser.family
+
+                        if user_agent.is_mobile:
+                            type_device = Tracker.MOBILE
+                        elif user_agent.is_tablet:
+                            type_device = Tracker.TABLET
+                        elif user_agent.is_pc:
+                            type_device = Tracker.PC
+                        elif user_agent.is_bot:
+                            type_device = Tracker.BOT
+                        else:
+                            type_device = Tracker.UNKNOWN
+
+                        tracker.operating_system = operating_system
+                        tracker.device_family = device_family
+                        tracker.browser = browser
+                        tracker.type_device = type_device
 
                     tracker.screen_height = raw_tracker.screen_height
                     tracker.screen_width = raw_tracker.screen_width
-
-                    tracker.operating_system = operating_system
-                    tracker.device_family = device_family
-                    tracker.browser = browser
-                    tracker.type_device = type_device
-
                     tracker.save()
 
-                    if profile.can_geolocation and not type_device in (Tracker.UNKNOWN, Tracker.BOT):
+                    if profile.can_geolocation and not type_device == Tracker.BOT:
                         if raw_tracker.ip:
                             geo = GeoIP2()
                             try:
