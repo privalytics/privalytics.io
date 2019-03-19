@@ -83,9 +83,9 @@ class Command(BaseCommand):
                     parsed_referrer = urlparse(raw_tracker.referrer)
                     referrer_url = normalize_referrer(normalize_website(parsed_referrer.hostname))
                     if 'google' in referrer_url:
-                        referrer_url = 'google'
+                        referrer_url = 'Google'
                     if 'bing' in referrer_url:
-                        referrer_url = 'bing'
+                        referrer_url = 'Bing'
                     referrer_page = parsed_referrer.path
 
                 tracker = Tracker.objects.create(
@@ -100,7 +100,11 @@ class Command(BaseCommand):
                 )
 
                 if not raw_tracker.dnt:
-                    user_agent = parse(raw_tracker.user_agent)
+                    try:
+                        user_agent = parse(raw_tracker.user_agent)
+                    except:
+                        logger.error('Problem parsing user agent Raw Tracker {}'.format(raw_tracker.id))
+                        user_agent = ''
                     operating_system = user_agent.os.family
                     device_family = user_agent.device.family
                     browser = user_agent.browser.family
