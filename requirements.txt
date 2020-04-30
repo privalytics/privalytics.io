@@ -5,7 +5,7 @@ cffi==1.11.5
 chardet==3.0.4
 Click==7.0
 cryptography==2.5
-Django==2.1.11
+Django==3.0.5
 django-appconf==1.0.2
 django-bootstrap-daterangepicker==1.0.4
 django-compressor==2.2
@@ -27,7 +27,7 @@ invoke==1.2.0
 jsonfield==2.0.2
 lockfile==0.12.2
 Markdown==3.0.1
-maxminddb==1.4.1
+maxminddb==1.5.2
 paramiko==2.4.2
 psycopg2-binary==2.7.7
 pyasn1==0.4.5
