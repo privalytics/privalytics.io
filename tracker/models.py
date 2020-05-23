@@ -187,6 +187,39 @@ class Website(models.Model):
                             .order_by('-visits')[:num_pages]
         return landing_pages
 
+    def get_referrers_page(self, page, start_date, end_date, num_referrers=10):
+        referrers = self.trackers.exclude(referrer_url='') \
+                        .exclude(referrer_url=None)\
+                        .filter(page=page) \
+                        .filter(timestamp__gte=start_date, timestamp__lte=end_date)\
+                        .values('referrer_url') \
+                        .annotate(visits=Count('referrer_url')) \
+                        .order_by('-visits')[:num_referrers]
+        referrer_list = []
+        visits_list = []
+        for ref in referrers:
+            referrer_list.append(ref['referrer_url'])
+            visits_list.append(ref['visits'])
+        return {'referrers_list': referrer_list, 'visits': visits_list}
+
+    def get_views_page(self, page, start_date, end_date):
+        current_results = self.trackers \
+            .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+            .filter(page=page) \
+            .exclude(type_device=Tracker.BOT) \
+            .exclude(referrer_url__contains=self.website_url) \
+            .annotate(month=TruncDay('timestamp')) \
+            .values('month') \
+            .annotate(requests=Count('pk')).order_by('-month')
+
+        for item in current_results:
+            item['t'] = '{date}' \
+                .format(date=item.pop('month'))
+            item['y'] = item.pop('requests')
+
+        return list(current_results)
+
+
     def get_top_referrers(self, start_date, end_date, num_referrers=10):
         referrers = self.trackers.exclude(referrer_url='') \
                         .exclude(referrer_url=None)\
