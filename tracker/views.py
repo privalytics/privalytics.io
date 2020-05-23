@@ -14,7 +14,8 @@ class WebsiteStats(View):
 
     def get_context(self, website, start_date, end_date):
         visitors = website.get_daily_visits(start_date, end_date)
-        total_visitors = website.get_page_views(start_date, end_date)
+        total_views = website.get_page_views(start_date, end_date)
+        total_visitors = website.get_uniques(start_date, end_date)
         referrers = website.get_top_referrers(start_date, end_date)
         pages = website.get_top_pages(start_date, end_date)
         devices = website.get_top_devices(start_date, end_date)
@@ -43,6 +44,7 @@ class WebsiteStats(View):
         ctx = {}
         ctx.update({
             'visitors': visitors,
+            'total_views': total_views,
             'total_visitors': total_visitors,
             'referrers': referrers,
             'pages': pages,
