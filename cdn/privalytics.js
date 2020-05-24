@@ -1,4 +1,4 @@
-let beat = function (secret_id) {
+function beat(secret_id) {
     window.addEventListener('focus', startTimer);
     window.addEventListener('blur', stopTimer);
 
@@ -11,7 +11,7 @@ let beat = function (secret_id) {
     }
 }
 
-let send_beat = function (secret_id) {
+function send_beat(secret_id) {
     var data = {secret_id: secret_id};
     var request = new XMLHttpRequest();
     request.open('POST', 'https://www.privalytics.io/api/beat', true);
@@ -19,7 +19,7 @@ let send_beat = function (secret_id) {
     request.send(JSON.stringify(data));
 }
 
-let privalytics = function (privalytics_id) {
+function privalytics(privalytics_id) {
     if (!window) return;
     var url = window.location;
     var document = window.document;
@@ -44,5 +44,6 @@ let privalytics = function (privalytics_id) {
         }
     };
     request.send(JSON.stringify(data));
-};
+}
+
 privalytics(privalytics_id);
