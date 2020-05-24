@@ -226,13 +226,14 @@ class Website(models.Model):
                             .values('referrer_page') \
                             .annotate(visits=Count('referrer_page')) \
                             .order_by('-visits')[:limit]
-        page_list = []
-        visits_list = []
-        for link in internal_links:
-            page_list.append(link['referrer_page'])
-            visits_list.append(link['visits'])
-
-        return {'page_list': page_list, 'visits_list': visits_list}
+        # page_list = []
+        # visits_list = []
+        # for link in internal_links:
+        #     page_list.append(link['referrer_page'])
+        #     visits_list.append(link['visits'])
+        #
+        # return {'page_list': page_list, 'visits_list': visits_list}
+        return internal_links
 
     def get_top_referrers(self, start_date, end_date, num_referrers=10):
         referrers = self.trackers.exclude(referrer_url='') \

@@ -150,8 +150,8 @@ class PageDetails(View):
             'visits': visits,
             'referrers': referrers['referrers_list'],
             'referrer_vistis': referrers['visits'],
-            'internal_links': internal_links['page_list'],
-            'internal_visits': internal_links['visits_list'],
+            'internal_links': internal_links,
+            # 'internal_visits': internal_links['visits_list'],
             'landing_pages': [],
         })
 

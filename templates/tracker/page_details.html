@@ -40,9 +40,9 @@
                                 </div>
                                 <div class="row no-gutters align-items-center">
                                     <div class="col-auto popular-pages">
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ internal_links.0|truncatechars:20 }}<span
-                                                class="tooltiptext">{{ internal_links.0 }}</span></div>
-                                        <small>Visits: {{ internal_visits.0 }}</small>
+                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ internal_links.0.referrer_page|truncatechars:20 }}<span
+                                                class="tooltiptext">{{ internal_links.0.referrer_page }}</span></div>
+                                        <small>Visits: {{ internal_links.0.visits }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -77,14 +77,14 @@
             <div class="col-lg-6">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Referring pages</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">External Referrers</h6>
                     </div>
                     <div class="card shadow mb-4">
                         <div class="card-body">
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <td>Page</td>
+                                    <td>Referrer</td>
                                     <td>Visits</td>
                                 </tr>
                                 </thead>
@@ -102,7 +102,7 @@
             <div class="col-lg-6">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Landing pages</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Internal Links</h6>
                     </div>
                     <div class="card shadow mb-4">
                         <div class="card-body">
@@ -113,9 +113,9 @@
                                     <td>Visits</td>
                                 </tr>
                                 </thead>
-                                {% for page in landing_pages %}
+                                {% for page in internal_links %}
                                     <tr>
-                                        <td>{{ page.page }}</td>
+                                        <td>{{ page.referrer_page }}</td>
                                         <td>{{ page.visits }}</td>
                                     </tr>
                                 {% endfor %}
