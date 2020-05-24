@@ -1,6 +1,8 @@
 function beat(secret_id) {
     window.addEventListener('focus', startTimer);
     window.addEventListener('blur', stopTimer);
+    var count = 0;
+    var myInterval;
 
     function startTimer() {
         console.log("Starting Timer")
@@ -18,7 +20,9 @@ function beat(secret_id) {
         request.open('POST', 'https://www.privalytics.io/api/beat', true);
         request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         request.send(JSON.stringify(data));
+        count++;
         console.log("Sent Beat")
+        console.log(count)
     }
 }
 
