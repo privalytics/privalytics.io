@@ -19,12 +19,11 @@ var privalytics = function (privalytics_id) {
     request.onload = function (e) {
         if (this.status === 200) {
             console.log('response', this.response); // JSON response
-            var response = this.response
+            console.log('id', this.response.id);
         }
     };
     request.send(JSON.stringify(data));
     console.log(response);
     return response.id;
 };
-let secret_id = privalytics(privalytics_id);
-console.log(secret_id);
+privalytics(privalytics_id);
