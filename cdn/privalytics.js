@@ -1,39 +1,16 @@
 function beat(secret_id) {
-    window.addEventListener('focus', startTimer);
-    window.addEventListener('blur', stopTimer);
-    var count = 0;
-    var myInterval;
-
-    function startTimer() {
-        console.log("Starting Timer")
-        var myInterval = setInterval(send_beat, 20000);
-    }
-
-    function stopTimer() {
-        console.log("Stopping Timer")
-        clearInterval(myInterval);
-    }
-
-    function send_beat() {
+    if (document.visibilityState === 'visible') {
         var data = {secret_id: secret_id};
         var request = new XMLHttpRequest();
         request.open('POST', 'https://www.privalytics.io/api/beat', true);
         request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         request.send(JSON.stringify(data));
-        count++;
         console.log("Sent Beat");
-        console.log(count);
-        if (document.visibilityState === 'visible'){
-            console.log('Visible')
-        }
-        if (document.visibilityState === 'hidden'){
-            console.log('Hidden')
-        }
     }
-
-    startTimer();
+    if (document.visibilityState === 'hidden') {
+        console.log('Hidden')
+    }
 }
-
 
 function privalytics(privalytics_id) {
     if (!window) return;
@@ -55,8 +32,10 @@ function privalytics(privalytics_id) {
     request.responseType = 'json';
     request.onload = function (e) {
         if (this.status === 200) {
-            let secret_id = this.response.id;
-            beat(secret_id);
+            var secret_id = this.response.id;
+            var intervalID = setInterval(function () {
+                beat(secret_id);
+            }, 20000);
         }
     };
     request.send(JSON.stringify(data));
