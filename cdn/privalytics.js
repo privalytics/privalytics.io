@@ -23,7 +23,12 @@ function beat(secret_id) {
         count++;
         console.log("Sent Beat");
         console.log(count);
-        console.log(document.visibilityState);
+        if (document.visibilityState === 'visible'){
+            console.log('Visible')
+        }
+        if (document.visibilityState === 'hidden'){
+            console.log('Hidden')
+        }
     }
 
     startTimer();
