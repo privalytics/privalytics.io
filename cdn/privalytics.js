@@ -4,7 +4,6 @@ var beat = function (secret_id) {
     request.open('POST', 'https://www.privalytics.io/api/beat', true);
     request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     request.send(JSON.stringify(data));
-    console.log('Sending data');
 }
 
 var privalytics = function (privalytics_id) {
@@ -27,8 +26,6 @@ var privalytics = function (privalytics_id) {
     request.responseType = 'json';
     request.onload = function (e) {
         if (this.status === 200) {
-            console.log('response', this.response); // JSON response
-            console.log('id', this.response.id);
             var secret_id = this.response.id;
             var intervalID = setInterval(function () {
                 beat(secret_id);
