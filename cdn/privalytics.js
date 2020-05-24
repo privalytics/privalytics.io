@@ -1,5 +1,5 @@
 var beat = function (secret_id) {
-    var data = {id: secret_id};
+    var data = {secret_id: secret_id};
     var request = new XMLHttpRequest();
     request.open('POST', 'https://www.privalytics.io/api/beat', true);
     request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
