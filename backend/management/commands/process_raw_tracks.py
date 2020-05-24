@@ -39,6 +39,7 @@ class Command(BaseCommand):
         logger.info('Starting the processing of raw tracks')
         t0 = time.time()
         total_raw_trackers_analysed = 0
+        total_beat_trackers_analysed = 0
         admins_warned = False
         running_time = 0
         while True:
@@ -155,6 +156,7 @@ class Command(BaseCommand):
                     tracker = Tracker.objects.get(raw_tracker__id=beat_tracker['raw_tracker'])
                     tracker.session_length += 20*beat_tracker['pk__count']
                     tracker.save()
+                    total_beat_trackers_analysed += beat_tracker['pk__count']
                 except Tracker.DoesNotExist:
                     logger.warning(f"Processing beat for a non existing tracker: (id: {beat_tracker['raw_tracker']}) ")
             beats.update(processed=True)
@@ -187,5 +189,10 @@ class Command(BaseCommand):
                 total_raw_trackers_analysed = 0
                 t0 = time.time()
 
-            time.sleep(60*30)  # It sleeps for 30 minutes before going to new batch
+            if t2-t1 < 30:
+                time.sleep(60*30-(t2-t1))  # It sleeps for what is left of the 30 minutes
+            else:
+                logger.error('Processing the batch takes longer than 30 minutes')
+                time.sleep(5)  # Only sleep 5 seconds and continue. This is done just to release the CPU.
+                               # However, if we are in this condition, it means the server is not able to keep up.
 
