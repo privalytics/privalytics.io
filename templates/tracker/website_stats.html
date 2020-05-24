@@ -167,13 +167,17 @@
                                 <thead>
                                 <tr>
                                     <td>Page</td>
+                                    <td>Total Visits</td>
+                                    <td>Length</td>
                                     <td>Visits</td>
                                 </tr>
                                 </thead>
                                 {% for page in pages %}
                                     <tr>
-                                        <td>{{ page.page }}</td>
-                                        <td>{{ page.visits }}</td>
+                                        <td>{{ page.page.page }}</td>
+                                        <td>{{ page.page.visits }}</td>
+                                        <td>{{ page.length.avg_session }}</td>
+                                        <td>{{ page.length.total_sessions }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>

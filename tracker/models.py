@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 from django.db.models import Count, F
+from django.db.models.aggregates import Avg
 from django.db.models.functions import TruncHour, TruncDay
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -129,7 +130,6 @@ class Website(models.Model):
                     .values('page') \
                     .annotate(visits=Count('page')) \
                     .order_by('-visits')[:10]
-
         return pages
 
     def get_top_devices(self, start_date, end_date):
@@ -349,6 +349,19 @@ class Website(models.Model):
             countries=countries
         )
         return data
+
+    def get_session_length(self, start_date, end_date, page=None):
+        """ If page is none, then it is the data for the website """
+        session_length = self.trackers.filter(timestamp__gte=start_date, timestamp__lte=end_date)\
+                            .filter(session_length__gt=0)
+        if page is not None:
+            session_length = session_length.filter(page=page)
+
+        total_sessions = session_length.count()
+        session_stats = session_length.aggregate(Avg('session_length'))
+
+        return {'total_sessions': total_sessions, 'avg_session': session_stats['session_length__avg']}
+
 
     def __str__(self):
         if self.website_name:

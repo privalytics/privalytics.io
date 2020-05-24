@@ -41,17 +41,27 @@ class WebsiteStats(View):
             'visits': referrers['visits'][i]
         } for i in range(len(referrers['referrers_list']))]
 
+        visit_lengths = []
+
+        for page in pages:
+            lengths = website.get_session_length(start_date, end_date, page)
+            visit_lengths.append({
+                'page': page,
+                'length': lengths,
+            })
+
         ctx = {}
         ctx.update({
             'visitors': visitors,
             'total_views': total_views,
             'total_visitors': total_visitors,
             'referrers': referrers,
-            'pages': pages,
+            'pages': visit_lengths,
             'devices': devices,
             'operating_systems': operating_systems,
             'screen_widths': screen_widths,
-            'screens': screens
+            'screens': screens,
+
         })
         ctx.update({'website': website})
 
