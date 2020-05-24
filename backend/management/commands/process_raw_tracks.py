@@ -151,9 +151,12 @@ class Command(BaseCommand):
             beats = BeatTracker.objects.filter(processed=False)
             qs = beats.values('raw_tracker').annotate(Count('pk'))
             for beat_tracker in qs:
-                tracker = Tracker.objects.filter(raw_tracker__id=beat_tracker['raw_tracker']).first()
-                tracker.session_length += 20*beat_tracker['pk__count']
-                tracker.save()
+                try:
+                    tracker = Tracker.objects.get(raw_tracker__id=beat_tracker['raw_tracker'])
+                    tracker.session_length += 20*beat_tracker['pk__count']
+                    tracker.save()
+                except Tracker.DoesNotExist:
+                    logger.warning(f"Processing beat for a non existing tracker: (id: {beat_tracker['raw_tracker']}) ")
             beats.update(processed=True)
 
             t2 = time.time()
