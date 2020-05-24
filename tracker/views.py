@@ -45,7 +45,10 @@ class WebsiteStats(View):
 
         for page in pages:
             lengths = website.get_session_length(start_date, end_date, page['page'])
-            lengths['avg_session'] = str(timedelta(seconds=lengths['avg_session']))
+            try:
+                lengths['avg_session'] = str(timedelta(seconds=lengths['avg_session']))
+            except TypeError:
+                pass
             visit_lengths.append({
                 'page': page,
                 'length': lengths,
