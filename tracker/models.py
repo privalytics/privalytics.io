@@ -1,4 +1,5 @@
 import json
+import uuid
 from datetime import timedelta
 
 from django.contrib.auth.models import User
@@ -226,13 +227,6 @@ class Website(models.Model):
                             .values('referrer_page') \
                             .annotate(visits=Count('referrer_page')) \
                             .order_by('-visits')[:limit]
-        # page_list = []
-        # visits_list = []
-        # for link in internal_links:
-        #     page_list.append(link['referrer_page'])
-        #     visits_list.append(link['visits'])
-        #
-        # return {'page_list': page_list, 'visits_list': visits_list}
         return internal_links
 
     def get_top_referrers(self, start_date, end_date, num_referrers=10):
@@ -378,8 +372,19 @@ class RawTracker(models.Model):
     website_does_not_exist = models.BooleanField(default=False)
     wrong_owner = models.BooleanField(default=False)
 
+    secret_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
+
     def __str__(self):
-        return "Raw Tracker {}".format(self.id)
+        if self.processed:
+            return "[Processed] Raw Tracker {}".format(self.id)
+        return "[Unrocessed] Raw Tracker {}".format(self.id)
+
+
+class BeatTracker(models.Model):
+    """ Keeps track of the duration of each page visit. """
+    timestamp = models.DateTimeField(auto_now_add=True)
+    raw_tracker = models.ForeignKey(RawTracker, on_delete=models.CASCADE, related_name='beats')
+    processed = models.BooleanField(default=False)
 
 
 class Tracker(models.Model):

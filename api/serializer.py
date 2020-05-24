@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from tracker.models import RawTracker
+from tracker.models import RawTracker, BeatTracker
 
 
 class TrackerSerializer(serializers.ModelSerializer):
