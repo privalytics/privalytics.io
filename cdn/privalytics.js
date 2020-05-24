@@ -16,6 +16,15 @@ var privalytics = function (privalytics_id) {
     request.open('POST', 'https://www.privalytics.io/api/tracker', true);
     request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     request.send(JSON.stringify(data));
-    console.log(request.response)
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                var response = request.responseText;
+            }
+        }
+    };
+    console.log(response);
+    return response.id;
 };
-privalytics(privalytics_id);
+let secret_id = privalytics(privalytics_id);
+console.log(secret_id);
