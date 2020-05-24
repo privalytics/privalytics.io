@@ -136,7 +136,7 @@ class ReferrersView(View):
 
 
 class PageDetails(View):
-    template_name = 'tracker/referrer_details.html'
+    template_name = 'tracker/page_details.html'
 
     def get_context(self, website, start_date, end_date, page_name):
         page_name = '/' + page_name + '/'
