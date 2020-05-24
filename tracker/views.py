@@ -143,11 +143,15 @@ class PageDetails(View):
         ctx = {}
 
         visits = website.get_views_page(page_name, start_date, end_date)
-        pages = website.get_referrers_page(page_name, start_date, end_date)
+        referrers = website.get_referrers_page(page_name, start_date, end_date)
+        internal_links = website.get_internal_links(page_name, start_date, end_date)
 
         ctx.update({
             'visits': visits,
-            'pages': pages['referrers_list'],
+            'referrers': referrers['referrers_list'],
+            'referrer_vistis': referrers['visits'],
+            'internal_links': internal_links['page_list'],
+            'internal_visits': internal_links['visits_list'],
             'landing_pages': [],
         })
 

@@ -219,6 +219,20 @@ class Website(models.Model):
 
         return list(current_results)
 
+    def get_internal_links(self, page, start_date, end_date, limit=10):
+        internal_links = self.trackers.filter(referrer_url__contains=self.website_url) \
+                            .filter(page=page) \
+                            .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+                            .values('referrer_url') \
+                            .annotate(visits=Count('referrer_url')) \
+                            .order_by('-visits')[:limit]
+        page_list = []
+        visits_list = []
+        for link in internal_links:
+            page_list.append(link['referrer_url'])
+            visits_list.append(link['visits'])
+
+        return {'page_list': page_list, 'visits_list': visits_list}
 
     def get_top_referrers(self, start_date, end_date, num_referrers=10):
         referrers = self.trackers.exclude(referrer_url='') \
