@@ -15,7 +15,7 @@ import time
 
 from django.core.mail import mail_admins
 from django.core.management import BaseCommand
-from django.db.models import Max
+from django.db.models import Max, Count
 
 from accounts.models import Profile
 from tracker.models import RawTracker, Tracker, Website, BeatTracker
@@ -99,6 +99,7 @@ class Command(BaseCommand):
                     utm_source=utm_source,
                     raw_tracker=raw_tracker,
                 )
+                type_device = None
 
                 if not raw_tracker.dnt:
                     try:
@@ -148,11 +149,10 @@ class Command(BaseCommand):
                 raw_tracker.save()
 
             beats = BeatTracker.objects.filter(processed=False)
-            qs = beats.values('raw_tracker', 'raw_tracker__timestamp').annotate(Max('timestamp'))
+            qs = beats.values('raw_tracker').annotate(Count('pk'))
             for beat_tracker in qs:
                 tracker = Tracker.objects.filter(raw_tracker__id=beat_tracker['raw_tracker']).first()
-                dt = beat_tracker['timestamp__max'] - beat_tracker['raw_tracker__timestamp']
-                tracker.session_length = dt.seconds
+                tracker.session_length += 20*beat_tracker['pk__count']
                 tracker.save()
             beats.update(processed=True)
 
