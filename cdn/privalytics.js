@@ -23,6 +23,7 @@ function beat(secret_id) {
         count++;
         console.log("Sent Beat");
         console.log(count);
+        console.log(document.visibilityState);
     }
 
     startTimer();
