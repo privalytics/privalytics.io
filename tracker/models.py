@@ -223,13 +223,13 @@ class Website(models.Model):
         internal_links = self.trackers.filter(referrer_url__contains=self.website_url) \
                             .filter(page=page) \
                             .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
-                            .values('referrer_url') \
-                            .annotate(visits=Count('referrer_url')) \
+                            .values('referrer_page') \
+                            .annotate(visits=Count('referrer_page')) \
                             .order_by('-visits')[:limit]
         page_list = []
         visits_list = []
         for link in internal_links:
-            page_list.append(link['referrer_url'])
+            page_list.append(link['referrer_page'])
             visits_list.append(link['visits'])
 
         return {'page_list': page_list, 'visits_list': visits_list}
