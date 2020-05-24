@@ -436,6 +436,9 @@ class Tracker(models.Model):
     # The page from which the visitor came from. Everything from the first '/'
     referrer_page = models.CharField(max_length=255, blank=True, null=True)
 
+    # Use BeatTracker to calculate the total time a person spends on a page
+    session_length = models.IntegerField(default=0)
+
     raw_tracker = models.ForeignKey(RawTracker, on_delete=models.CASCADE, null=True, default=None)
 
     @classmethod
