@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from accounts.models import WaitingList
 from tracker.models import Website
 from util.normalize_websites import normalize_website
 
@@ -32,6 +33,11 @@ class SignUpForm(MyUserCreationForm):
             raise forms.ValidationError("An account with this e-mail already exists")
         return email
 
+
+class WaitingListForm(MyModelForm):
+    class Meta:
+        model = WaitingList
+        fields = ('name', 'email', 'website')
 
 class WebsiteCreationForm(MyModelForm):
 

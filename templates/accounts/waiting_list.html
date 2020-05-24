@@ -1,0 +1,35 @@
+{% extends 'privalytics/base_index.html' %}
+{% load static %}
+
+{% block custom_css %}
+    <link href="{% static 'privalytics/css/signup.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <section id="signup">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+                    <div class="card card-signin my-5">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Thank you for signing up!</h5>
+                            <p class="lead">Privalytics is currently full. We will invite people as soon as we scale our
+                            infrastructure.</p>
+                            <p class="lead">We really appreciate your interest!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'signup' %}">Sign up</a>
+        </li>
+    </ul>
+{% endblock %}

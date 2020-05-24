@@ -58,6 +58,20 @@ class Profile(models.Model):
         self.user.email_user(subject, message, from_email='Privalytics <noreply@privalytics.io>')
 
 
+class WaitingList(models.Model):
+    name = models.CharField(blank=True, null=True, max_length=255)
+    email = models.EmailField(blank=False, null=False, unique=True)
+    website = models.CharField(max_length=255, blank=False)
+    account_type = models.CharField(max_length=50, null=True, blank=True)
+    sign_up_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        if self.name:
+            return f"{self.name} <{self.email}>"
+        return f"self.email"
+
+
+
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
     if created:

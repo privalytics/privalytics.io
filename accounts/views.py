@@ -10,7 +10,7 @@ from django.utils.timezone import now
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DetailView
 from django.contrib.auth import login as auth_login
-from accounts.forms import SignUpForm, WebsiteCreationForm, ContactInformation
+from accounts.forms import SignUpForm, WebsiteCreationForm, ContactInformation, WaitingListForm
 from accounts.models import Subscription
 from accounts.tokens import account_activation_token
 from tracker.models import Website
@@ -20,20 +20,17 @@ class SignUpView(View):
     template_name = 'accounts/sign_up.html'
 
     def get(self, request, account_type=None):
-        form = SignUpForm()
+        form = WaitingListForm()
         request.session['account_type'] = account_type
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        form = SignUpForm(request.POST)
+        form = WaitingListForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            user.profile.account_selected_signup = request.session.get('account_type')
-            user.save()
-            user.profile.save()
-            user.profile.send_activation_email(current_site=get_current_site(request).domain)
-            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('dashboard')
+            waiting_list = form.save()
+            waiting_list.account_type = request.session.get('account_type')
+            waiting_list.save()
+            return redirect('waiting-list')
         return render(request, self.template_name, {'form': form})
 
 
