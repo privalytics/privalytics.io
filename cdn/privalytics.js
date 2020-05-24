@@ -5,10 +5,6 @@ function beat(secret_id) {
         request.open('POST', 'https://www.privalytics.io/api/beat', true);
         request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         request.send(JSON.stringify(data));
-        console.log("Sent Beat");
-    }
-    if (document.visibilityState === 'hidden') {
-        console.log('Hidden')
     }
 }
 
