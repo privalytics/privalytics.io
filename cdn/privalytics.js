@@ -15,14 +15,14 @@ var privalytics = function (privalytics_id) {
     var request = new XMLHttpRequest();
     request.open('POST', 'https://www.privalytics.io/api/tracker', true);
     request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    request.send(JSON.stringify(data));
-    request.onreadystatechange = function () {
-        if (request.readyState === 4) {
-            if (request.status === 200) {
-                var response = request.responseText;
-            }
+    request.responseType = 'json';
+    request.onload = function (e) {
+        if (this.status === 200) {
+            console.log('response', this.response); // JSON response
+            var response = this.response
         }
     };
+    request.send(JSON.stringify(data));
     console.log(response);
     return response.id;
 };
