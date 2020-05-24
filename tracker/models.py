@@ -372,7 +372,7 @@ class RawTracker(models.Model):
     website_does_not_exist = models.BooleanField(default=False)
     wrong_owner = models.BooleanField(default=False)
 
-    secret_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
+    secret_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False, null=True)
 
     def __str__(self):
         if self.processed:
