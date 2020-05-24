@@ -21,9 +21,11 @@ function beat(secret_id) {
         request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         request.send(JSON.stringify(data));
         count++;
-        console.log("Sent Beat")
-        console.log(count)
+        console.log("Sent Beat");
+        console.log(count);
     }
+
+    startTimer();
 }
 
 
