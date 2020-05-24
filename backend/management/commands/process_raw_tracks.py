@@ -15,9 +15,10 @@ import time
 
 from django.core.mail import mail_admins
 from django.core.management import BaseCommand
+from django.db.models import Max
 
 from accounts.models import Profile
-from tracker.models import RawTracker, Tracker, Website
+from tracker.models import RawTracker, Tracker, Website, BeatTracker
 from urllib.parse import urlparse
 from django.http import QueryDict
 from user_agents import parse
@@ -145,6 +146,15 @@ class Command(BaseCommand):
                     tracker.save()
                 raw_tracker.processed = True
                 raw_tracker.save()
+
+            beats = BeatTracker.objects.filter(processed=False)
+            qs = beats.values('raw_tracker', 'raw_tracker__timestamp').annotate(Max('timestamp'))
+            for beat_tracker in qs:
+                tracker = Tracker.objects.filter(raw_tracker__id=beat_tracker['raw_tracker']).first()
+                dt = beat_tracker['timestamp__max'] - beat_tracker['raw_tracker__timestamp']
+                tracker.session_length = dt.seconds
+                tracker.save()
+            beats.update(processed=True)
 
             t2 = time.time()
             running_time += t2-t1
