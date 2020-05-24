@@ -147,7 +147,7 @@ class PageDetails(View):
 
         ctx.update({
             'visits': visits,
-            'pages': pages,
+            'pages': pages['referrers_list'],
             'landing_pages': [],
         })
 
