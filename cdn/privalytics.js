@@ -4,6 +4,7 @@ var beat = function (secret_id) {
     request.open('POST', 'https://www.privalytics.io/api/beat', true);
     request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     request.send(JSON.stringify(data));
+    console.log('Sending data');
 }
 
 var privalytics = function (privalytics_id) {
@@ -35,6 +36,5 @@ var privalytics = function (privalytics_id) {
         }
     };
     request.send(JSON.stringify(data));
-    return response.id;
 };
 privalytics(privalytics_id);
