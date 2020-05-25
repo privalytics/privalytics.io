@@ -14,7 +14,8 @@ class WebsiteStats(View):
 
     def get_context(self, website, start_date, end_date):
         visitors = website.get_daily_visits(start_date, end_date)
-        total_visitors = website.get_page_views(start_date, end_date)
+        total_views = website.get_page_views(start_date, end_date)
+        total_visitors = website.get_uniques(start_date, end_date)
         referrers = website.get_top_referrers(start_date, end_date)
         pages = website.get_top_pages(start_date, end_date)
         devices = website.get_top_devices(start_date, end_date)
@@ -40,16 +41,31 @@ class WebsiteStats(View):
             'visits': referrers['visits'][i]
         } for i in range(len(referrers['referrers_list']))]
 
+        visit_lengths = []
+
+        for page in pages:
+            lengths = website.get_session_length(start_date, end_date, page['page'])
+            try:
+                lengths['avg_session'] = str(timedelta(seconds=lengths['avg_session']))
+            except TypeError:
+                pass
+            visit_lengths.append({
+                'page': page,
+                'length': lengths,
+            })
+
         ctx = {}
         ctx.update({
             'visitors': visitors,
+            'total_views': total_views,
             'total_visitors': total_visitors,
             'referrers': referrers,
-            'pages': pages,
+            'pages': visit_lengths,
             'devices': devices,
             'operating_systems': operating_systems,
             'screen_widths': screen_widths,
-            'screens': screens
+            'screens': screens,
+
         })
         ctx.update({'website': website})
 
@@ -131,6 +147,44 @@ class ReferrersView(View):
             ctx.update({'form': form})
             return render(request, self.template_name, ctx)
         return redirect(website.get_absolute_url())
+
+
+class PageDetails(View):
+    template_name = 'tracker/page_details.html'
+
+    def get_context(self, website, start_date, end_date, page_name):
+        page_name = '/' + page_name + '/'
+        ctx = {}
+
+        visits = website.get_views_page(page_name, start_date, end_date)
+        referrers = website.get_referrers_page(page_name, start_date, end_date)
+        internal_links = website.get_internal_links(page_name, start_date, end_date)
+
+        ctx.update({
+            'visits': visits,
+            'referrers': referrers['referrers_list'],
+            'referrer_vistis': referrers['visits'],
+            'internal_links': internal_links,
+            # 'internal_visits': internal_links['visits_list'],
+            'landing_pages': [],
+        })
+
+        ctx.update({'website': website})
+        ctx.update({'ref_name': page_name})
+
+        return ctx
+
+    def get(self, request, website_url, page_name):
+        start_date = now() - timedelta(days=30)
+        end_date = now()
+        website = get_object_or_404(Website, website_url=website_url)
+        if not website.is_public and not self.request.user.has_perm('can_view_website', website):
+            return redirect('login')
+
+        ctx = self.get_context(website, start_date, end_date, page_name)
+        ctx.update({'form': DateRangeForm(initial={'date_range': (start_date, end_date)})})
+
+        return render(request, self.template_name, ctx)
 
 class ReferrerDetails(View):
     template_name = 'tracker/referrer_details.html'

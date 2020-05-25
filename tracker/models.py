@@ -1,10 +1,12 @@
 import json
+import uuid
 from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 from django.db.models import Count, F
+from django.db.models.aggregates import Avg
 from django.db.models.functions import TruncHour, TruncDay
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -128,7 +130,6 @@ class Website(models.Model):
                     .values('page') \
                     .annotate(visits=Count('page')) \
                     .order_by('-visits')[:10]
-
         return pages
 
     def get_top_devices(self, start_date, end_date):
@@ -186,6 +187,47 @@ class Website(models.Model):
                             .annotate(visits=Count('id'))\
                             .order_by('-visits')[:num_pages]
         return landing_pages
+
+    def get_referrers_page(self, page, start_date, end_date, num_referrers=10):
+        referrers = self.trackers.exclude(referrer_url='') \
+                        .exclude(referrer_url=None)\
+                        .filter(page=page) \
+                        .filter(timestamp__gte=start_date, timestamp__lte=end_date)\
+                        .values('referrer_url') \
+                        .annotate(visits=Count('referrer_url')) \
+                        .order_by('-visits')[:num_referrers]
+        referrer_list = []
+        visits_list = []
+        for ref in referrers:
+            referrer_list.append(ref['referrer_url'])
+            visits_list.append(ref['visits'])
+        return {'referrers_list': referrer_list, 'visits': visits_list}
+
+    def get_views_page(self, page, start_date, end_date):
+        current_results = self.trackers \
+            .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+            .filter(page=page) \
+            .exclude(type_device=Tracker.BOT) \
+            .exclude(referrer_url__contains=self.website_url) \
+            .annotate(month=TruncDay('timestamp')) \
+            .values('month') \
+            .annotate(requests=Count('pk')).order_by('-month')
+
+        for item in current_results:
+            item['t'] = '{date}' \
+                .format(date=item.pop('month'))
+            item['y'] = item.pop('requests')
+
+        return list(current_results)
+
+    def get_internal_links(self, page, start_date, end_date, limit=10):
+        internal_links = self.trackers.filter(referrer_url__contains=self.website_url) \
+                            .filter(page=page) \
+                            .filter(timestamp__gte=start_date, timestamp__lte=end_date) \
+                            .values('referrer_page') \
+                            .annotate(visits=Count('referrer_page')) \
+                            .order_by('-visits')[:limit]
+        return internal_links
 
     def get_top_referrers(self, start_date, end_date, num_referrers=10):
         referrers = self.trackers.exclude(referrer_url='') \
@@ -308,6 +350,19 @@ class Website(models.Model):
         )
         return data
 
+    def get_session_length(self, start_date, end_date, page=None):
+        """ If page is none, then it is the data for the website """
+        session_length = self.trackers.filter(timestamp__gte=start_date, timestamp__lte=end_date)\
+                            .filter(session_length__gt=0)
+        if page is not None:
+            session_length = session_length.filter(page=page)
+
+        total_sessions = session_length.count()
+        session_stats = session_length.aggregate(Avg('session_length'))
+
+        return {'total_sessions': total_sessions, 'avg_session': session_stats['session_length__avg']}
+
+
     def __str__(self):
         if self.website_name:
             return self.website_name
@@ -330,8 +385,19 @@ class RawTracker(models.Model):
     website_does_not_exist = models.BooleanField(default=False)
     wrong_owner = models.BooleanField(default=False)
 
+    secret_id = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False, null=True)
+
     def __str__(self):
-        return "Raw Tracker {}".format(self.id)
+        if self.processed:
+            return "[Processed] Raw Tracker {}".format(self.id)
+        return "[Unrocessed] Raw Tracker {}".format(self.id)
+
+
+class BeatTracker(models.Model):
+    """ Keeps track of the duration of each page visit. """
+    timestamp = models.DateTimeField(auto_now_add=True)
+    raw_tracker = models.ForeignKey(RawTracker, on_delete=models.CASCADE, related_name='beats')
+    processed = models.BooleanField(default=False)
 
 
 class Tracker(models.Model):
@@ -382,6 +448,9 @@ class Tracker(models.Model):
     referrer_url = models.CharField(blank=True, null=True, max_length=255)
     # The page from which the visitor came from. Everything from the first '/'
     referrer_page = models.CharField(max_length=255, blank=True, null=True)
+
+    # Use BeatTracker to calculate the total time a person spends on a page
+    session_length = models.IntegerField(default=0)
 
     raw_tracker = models.ForeignKey(RawTracker, on_delete=models.CASCADE, null=True, default=None)
 

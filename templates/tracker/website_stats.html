@@ -22,6 +22,7 @@
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Visitors
                                 </div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_visitors }}</div>
+                                <small>Page Views: {{ total_views }}</small>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-user fa-2x text-gray-300"></i>
@@ -59,9 +60,9 @@
                                 </div>
                                 <div class="row no-gutters align-items-center">
                                     <div class="col-auto popular-pages">
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ pages.0.page|truncatechars:20 }}<span
-                                                class="tooltiptext">{{ pages.0.page }}</span></div>
-                                        <small>Visits: {{ pages.0.visits }}</small>
+                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ pages.0.page.page|truncatechars:20 }}<span
+                                                class="tooltiptext">{{ pages.0.page.page }}</span></div>
+                                        <small>Visits: {{ pages.0.page.visits }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -166,13 +167,17 @@
                                 <thead>
                                 <tr>
                                     <td>Page</td>
+                                    <td>Total Visits</td>
+                                    <td>Length</td>
                                     <td>Visits</td>
                                 </tr>
                                 </thead>
                                 {% for page in pages %}
                                     <tr>
-                                        <td>{{ page.page }}</td>
-                                        <td>{{ page.visits }}</td>
+                                        <td>{{ page.page.page }}</td>
+                                        <td>{{ page.page.visits }}</td>
+                                        <td>{{ page.length.avg_session }}</td>
+                                        <td>{{ page.length.total_sessions }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
