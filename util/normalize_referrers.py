@@ -4,7 +4,12 @@ big_referrers = (
             ('twitter.com', 'Twitter'),
             ('reddit.com', 'Reddit'),
             ('t.co', 'Twitter'),
-            ('duckduckgo.com', 'DuckDuckGo')
+            ('duckduckgo.com', 'DuckDuckGo'),
+            ('linkedin.com', 'LinkedIn'),
+            ('lnkd.in', 'LinkedIn'),
+            ('feedly.com', 'Feedly'),
+            ('github.com', 'Github'),
+            ('indiehackers.com', 'Indie Hackers'),
         )
 
 
