@@ -452,7 +452,7 @@ class Tracker(models.Model):
     # Use BeatTracker to calculate the total time a person spends on a page
     session_length = models.IntegerField(default=0)
 
-    raw_tracker = models.ForeignKey(RawTracker, on_delete=models.CASCADE, null=True, default=None)
+    raw_tracker = models.ForeignKey(RawTracker, on_delete=models.SET_NULL, null=True, default=None)
 
     @classmethod
     def create_from_json(cls, request, data):
