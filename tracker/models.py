@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 
 from django.utils.timezone import now
 from guardian.shortcuts import assign_perm
-from ipware.ip import get_real_ip
+from ipware.ip import get_client_ip
 from django_countries.fields import CountryField
 from django_user_agents.utils import get_user_agent
 from django_countries import countries
@@ -452,8 +452,6 @@ class Tracker(models.Model):
     # Use BeatTracker to calculate the total time a person spends on a page
     session_length = models.IntegerField(default=0)
 
-    raw_tracker = models.ForeignKey(RawTracker, on_delete=models.CASCADE, null=True, default=None)
-
     @classmethod
     def create_from_json(cls, request, data):
         """ This is aimed at data originating from a POST request.
@@ -463,7 +461,7 @@ class Tracker(models.Model):
         """
 
         # Get the IP address and so the geographical info, if available.
-        ip_address = get_real_ip(request) or ''
+        ip_address = get_client_ip(request) or ''
         user_agent = get_user_agent(request)
 
         location_data = {}
