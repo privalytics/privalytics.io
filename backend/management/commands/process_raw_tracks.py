@@ -159,7 +159,7 @@ class Command(BaseCommand):
                     total_beat_trackers_analysed += beat_tracker['pk__count']
                 except Tracker.DoesNotExist:
                     logger.warning(f"Processing beat for a non existing tracker: (id: {beat_tracker['raw_tracker']}) ")
-            beats.update(processed=True)
+            beats.delete()
 
             t2 = time.time()
             running_time += t2-t1
