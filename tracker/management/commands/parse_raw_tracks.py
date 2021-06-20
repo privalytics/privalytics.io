@@ -47,10 +47,7 @@ class Command(BaseCommand):
             try:
                 website = Website.objects.get(website_url=website_url)
             except Website.DoesNotExist:
-                raw_tracker.ip = None
-                raw_tracker.website_does_not_exist = True
-                raw_tracker.processed = True
-                raw_tracker.save()
+                raw_tracker.delete()
                 continue
 
             if website.owner != profile.user:
@@ -78,7 +75,6 @@ class Command(BaseCommand):
                 referrer_page=referrer_page,
                 timestamp=raw_tracker.timestamp,
                 utm_source=utm_source,
-                raw_tracker=raw_tracker,
             )
 
             if not raw_tracker.dnt:
@@ -125,8 +121,7 @@ class Command(BaseCommand):
                 raw_tracker.ip = None
 
                 tracker.save()
-            raw_tracker.processed = True
-            raw_tracker.save()
+            raw_tracker.delete()
 
         t1 = time.time()
         logger.info('Processed {} logs in {}ms'.format(raw_trackers.count(), (t1-t0)*1000))
