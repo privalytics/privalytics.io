@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 
 from django.utils.timezone import now
 from guardian.shortcuts import assign_perm
-from ipware.ip import get_real_ip
+from ipware.ip import get_client_ip
 from django_countries.fields import CountryField
 from django_user_agents.utils import get_user_agent
 from django_countries import countries
@@ -463,7 +463,7 @@ class Tracker(models.Model):
         """
 
         # Get the IP address and so the geographical info, if available.
-        ip_address = get_real_ip(request) or ''
+        ip_address = get_client_ip(request) or ''
         user_agent = get_user_agent(request)
 
         location_data = {}

@@ -1,4 +1,4 @@
-from ipware.ip import get_real_ip
+from ipware.ip import get_client_ip
 
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
@@ -21,7 +21,7 @@ class TrackerView(APIView):
         if serializer.is_valid():
             raw_tracker = serializer.save()
             if not raw_tracker.dnt:
-                raw_tracker.ip = get_real_ip(request) or ''
+                raw_tracker.ip = get_client_ip(request) or ''
                 raw_tracker.user_agent = request.META['HTTP_USER_AGENT']
                 raw_tracker.save()
             return Response({'id': raw_tracker.secret_id}, status=status.HTTP_200_OK)
